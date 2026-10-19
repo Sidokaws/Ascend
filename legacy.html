@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#05070b" />
+  <title>SYSTEM // ASCEND — V1 LEGADO</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="bg-glow glow-a"></div>
+  <div class="bg-glow glow-b"></div>
+
+  <div id="levelUp" class="level-up" aria-hidden="true">
+    <div class="level-up__halo"></div>
+    <p>SYSTEM NOTIFICATION</p>
+    <h2>LEVEL UP</h2>
+    <strong id="newLevelText">LV. 2</strong>
+    <span>Novos limites foram desbloqueados.</span>
+  </div>
+
+  <div id="toast" class="toast" aria-live="polite"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">S</div>
+      <div>
+        <span class="eyebrow">PERSONAL GROWTH INTERFACE</span>
+        <h1>SYSTEM <i>//</i> ASCEND</h1>
+      </div>
+    </div>
+    <div class="top-actions">
+      <span id="todayLabel" class="date-chip"></span>
+      <button id="addMissionBtn" class="icon-btn" title="Nova missão">＋</button>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="hero panel">
+      <div class="player-id">
+        <div class="avatar-ring"><span>SW</span></div>
+        <div>
+          <span class="eyebrow">PLAYER IDENTIFIED</span>
+          <h2 id="playerName">SIDMAR WESLEY</h2>
+          <p><span id="rankText" class="rank">RANK E</span> · <span id="classText">DESPERTANDO</span></p>
+        </div>
+      </div>
+
+      <div class="level-block">
+        <div class="level-number"><small>LEVEL</small><strong id="levelText">01</strong></div>
+        <div class="xp-block">
+          <div class="xp-meta"><span>EXPERIENCE</span><strong id="xpText">0 / 500 XP</strong></div>
+          <div class="xp-bar"><div id="xpFill" class="xp-fill"></div></div>
+          <div class="xp-sub"><span id="totalXpText">0 XP TOTAL</span><span id="nextLevelText">500 XP PARA O PRÓXIMO NÍVEL</span></div>
+        </div>
+      </div>
+
+      <div class="quick-stats">
+        <div><span>STREAK</span><strong id="streakText">0</strong><small>DIAS</small></div>
+        <div><span>MISSÕES</span><strong id="completedText">0</strong><small>HOJE</small></div>
+        <div><span>CRÉDITOS</span><strong id="coinsText">0</strong><small>GOLD</small></div>
+      </div>
+    </section>
+
+    <section class="layout-grid">
+      <div class="main-column">
+        <section class="panel section-card">
+          <div class="section-head">
+            <div><span class="eyebrow">DAILY PROTOCOL</span><h3>Missões de hoje</h3></div>
+            <div class="mission-summary"><span id="missionPercent">0%</span><small>CONCLUÍDO</small></div>
+          </div>
+          <div id="missionList" class="mission-list"></div>
+        </section>
+
+        <section class="panel section-card">
+          <div class="section-head"><div><span class="eyebrow">RECENT ACTIVITY</span><h3>Histórico do sistema</h3></div></div>
+          <div id="historyList" class="history-list"></div>
+        </section>
+      </div>
+
+      <aside class="side-column">
+        <section class="panel section-card">
+          <div class="section-head"><div><span class="eyebrow">PLAYER STATUS</span><h3>Atributos</h3></div></div>
+          <div id="attributeList" class="attribute-list"></div>
+        </section>
+
+        <section class="panel system-message">
+          <span class="eyebrow">SYSTEM DIRECTIVE</span>
+          <p id="directiveText">Pequenas ações acumuladas produzem níveis que motivação nenhuma sustenta sozinha.</p>
+          <button id="emergencyBtn" class="secondary-btn">GERAR MISSÃO DE EMERGÊNCIA</button>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <dialog id="missionDialog" class="dialog">
+    <form id="missionForm" method="dialog">
+      <div class="dialog-head"><div><span class="eyebrow">CREATE QUEST</span><h3>Nova missão</h3></div><button type="button" id="closeDialog" class="close-btn">×</button></div>
+      <label>Nome da missão<input id="missionTitle" required maxlength="70" placeholder="Ex.: Revisar Direito Constitucional" /></label>
+      <div class="form-grid">
+        <label>Área<select id="missionCategory"><option value="study">Estudo</option><option value="fitness">Treino</option><option value="routine">Rotina</option><option value="work">Trabalho</option><option value="finance">Finanças</option></select></label>
+        <label>XP<input id="missionXp" type="number" min="10" max="1000" value="50" required /></label>
+      </div>
+      <button class="primary-btn" type="submit">ADICIONAR AO SISTEMA</button>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>

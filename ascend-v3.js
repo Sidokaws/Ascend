@@ -19,7 +19,7 @@ try{const old=JSON.parse(localStorage.getItem(PREV));if(old&&Array.isArray(old.m
 old.missions.forEach(m=>{if(!m.id.startsWith('seed')||m.done){const id='v2-'+m.id;if(!state.missions[id])state.missions[id]={id,date:m.date,title:m.title,type:m.kind||'teoria',source:m.source||'Registro legado',xp_base:0,evidence:m.evidence||'',status:m.done?'Enviado para revisão':'Pendente',validated:false,legacy:true}}});
 (old.grades||[]).forEach((g,i)=>{const id='v2-grade-'+i;if(!state.grades.some(a=>a.id===id))state.grades.push({...g,id,imported:true,confirmed:false})});
 (old.errors||[]).forEach((e,i)=>{const id='v2-error-'+i;if(!state.errors.some(a=>a.id===id))state.errors.push({...e,id})});
-}}
+}
 }catch(e){console.warn('V2 não pôde ser lida',e)}
 state.legacyImported=true;save();
 }

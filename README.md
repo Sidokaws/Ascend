@@ -1,41 +1,58 @@
-# SYSTEM // ASCEND — V1
+# SYSTEM // ASCEND — OAB 48 · V3
 
-Protótipo estático de um sistema pessoal de progressão inspirado em interfaces de RPG, com identidade visual original.
+Aplicativo de treinamento gamificado da 2ª fase da OAB em Direito Penal, com tela de despertar, níveis, missões, matriz de peças, discursivas, simulados e revisões.
 
-## O que já funciona
-- XP total e progressão de nível
-- Ranks E → D → C → B → A → S
-- Missões diárias por área da vida
-- Atributos: Conhecimento, Físico, Disciplina, Competência e Gestão
-- Streak por dias ativos
-- Gold/créditos
-- Histórico das missões concluídas
-- Missões personalizadas
-- Gerador de missão de emergência
-- Animação de LEVEL UP
-- Salvamento automático no navegador via localStorage
-- Layout responsivo para celular e desktop
+## Acesso
 
-## Como testar
-Abra `index.html` no navegador. Para evitar limitações locais de alguns navegadores, você também pode servir a pasta com um servidor local simples.
+- Aplicativo V3: https://sidokaws.github.io/Ascend/
+- V2 preservada: https://sidokaws.github.io/Ascend/oab48-v2.html
+- V1 original: https://sidokaws.github.io/Ascend/legacy.html
 
-## Publicar no GitHub Pages
-1. Abra **Settings → Pages**.
-2. Em **Build and deployment**, escolha **Deploy from a branch**.
-3. Selecione a branch `main` e a pasta `/ (root)`.
-4. Salve e aguarde a publicação indicada pelo GitHub.
+Publicação pelo GitHub Pages a partir da branch main e pasta raiz.
 
-## Próximos upgrades sugeridos
-- Tela de configuração do jogador
-- Calendário e gráficos semanais/mensais
-- Sistema de bosses e conquistas
-- Penalidades opcionais e recompensas
-- Loja/recompensas pessoais
-- Metas de longo prazo
-- Exportar/importar backup JSON
-- PWA instalável no celular
-- Login e sincronização em nuvem
-- Integração segura com IA via backend/serverless (nunca expondo chave no JavaScript do navegador)
+## Arquivos recebidos em 19/10/2026
 
-## Nota importante sobre IA
-Não coloque chaves de API diretamente em `app.js`. Em uma futura versão com IA, use uma função serverless/backend para guardar a chave e chamar o provedor de IA com segurança.
+| Original | Repositório | Papel |
+| --- | --- | --- |
+| OAB48_ASCEND_Plano_119_Dias_v1_1(2).json | data/plano-oab48-119-dias-v1.1.json | **Fonte de verdade** |
+| OAB48_ASCEND_Missoes_119_Dias_v1_1(1).csv | data/missoes-oab48-v1.1.csv | Referência tabular |
+| OAB48_Guia_ASCEND_Progressao_v1_1(1).md | docs/protocolo-progressivo-v1.1.md | Protocolo pedagógico |
+
+Plano: **119 dias, 274 missões com IDs únicos, 15 janelas condicionais de simulado e 334 horas previstas**. O CSV traz os mesmos IDs; não se duplica atividade.
+
+## Regras de execução
+
+- Treinamento previsto de 26/10/2026 a 21/02/2027. Revisão Turbo reservada 22–27/02/2027 e prova-alvo 28/02/2027, data ainda sujeita à confirmação oficial.
+- Sábados: descanso, sem penalidade.
+- Semana 1 e 2: reconhecimento, identificação de base e prazo no Vade, estruturas, teses TBFP e oficinas guiadas. Não exigir peça integral de memória no primeiro contato.
+- Antes de peça autônoma/simulado, comprovar prontidão; sem prontidão, transformar a janela em oficina orientada sem pontuar como integral/simulado.
+- Status: pendente → produção enviada com evidência → correção documentada → validação **manual**. XP apenas com validação. XP não equivale a domínio.
+- O aplicativo não verifica a qualidade das respostas nem conversa automaticamente com o mentor.
+- Notas de correção: usar espelho oficial somente se identificado; demais notas são pedagógicas.
+- Revisões D+1, D+7, D+15 e D+30 após correção efetivamente realizada.
+- Tempo efetivo = tempo bruto menos pausas marcadas.
+- As referências a PDFs/páginas vêm do plano enviado e estão sujeitas à auditoria após a mensagem “finalizei os envios”.
+
+## Dados e backup
+
+App estático, dados no localStorage do próprio navegador. Não há sincronização com GitHub, ChatGPT ou Notion. Fazer exportação periódica em Dados e backup → Exportar backup JSON.
+
+Chave V3: ascendOab48V3. Dados da V2 (ascendOab48V2) são preservados; atividades personalizadas ou já executadas são trazidas como legado sem inventar validação. As notas importadas são sinalizadas como não homologadas. A V1 (systemAscendV1) continua separada.
+
+Uma importação de backup pede confirmação antes de substituir registros locais. A atualização do plano utiliza os IDs originais (upsert) sem duplicações, preservando a evidência.
+
+## Arquivos da interface
+
+- index.html — introdução cinematográfica e oito áreas.
+- ascend-v3.css — visual RPG, animações e versão móvel.
+- ascend-v3.js — cronograma, missões, validação, timer e exportação/importação.
+- data/plano-oab48-119-dias-v1.1.json — plano canônico.
+- data/missoes-oab48-v1.1.csv — arquivo auxiliar.
+- docs/protocolo-progressivo-v1.1.md — diretrizes.
+- legacy.html e oab48-v2.html — versões anteriores.
+
+## Pendências futuras
+
+Espelhos com pontuação por item A/B e relatórios detalhados; confirmação oficial do edital/corte legislativo; auditoria das referências aos PDFs; testes adicionais em navegador e aparelho móvel. Sem integração com serviços externos ou chaves expostas.
+
+*Identidade gráfica original de fantasia sombria, sem reproduzir assets de terceiros.*

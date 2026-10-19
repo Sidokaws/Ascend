@@ -33,12 +33,12 @@ function missions(){return Object.values(state.missions)}
 function dayMissions(date){return missions().filter(m=>m.date===date).sort((a,b)=>a.id.localeCompare(b.id))}
 function numValid(s=state){return Object.values(s.missions||{}).filter(m=>m.validated===true).length}
 function validGrades(type,s=state){return (s.grades||[]).filter(g=>g.type===type&&g.confirmed===true)}
-function simCount(s=state){return validGrades('Simulado',s).filter(g=>g.complete===true&&g.is_full_piece===true).length}
+function simCount(s=state){return new Set(validGrades('Simulado',s).filter(g=>g.complete===true&&g.is_full_piece===true).map(g=>g.simId||g.topic||g.id)).size}
 function pieceCount(s=state){
 const keys=new Set();
 for(const m of Object.values(s.missions||{})){if(m.validated===true&&m.is_full_piece===true&&m.type!=='simulado_completo')keys.add(m.piece_case_id||m.id)}
-for(const g of validGrades('Peça',s)){if(g.is_full_piece===true)keys.add(g.case_id||g.topic||g.id)}
-for(const g of validGrades('Simulado',s)){if(g.complete===true&&g.is_full_piece===true)keys.add('sim-'+g.id)}
+for(const g of validGrades('Peça',s)){if(g.is_full_piece===true){const linked=Object.values(s.missions||{}).find(m=>m.validated===true&&m.is_full_piece===true&&m.piece_case_id&&String(g.topic).includes(m.piece_case_id));keys.add(linked?.piece_case_id||g.case_id||g.topic||g.id)}}
+for(const g of validGrades('Simulado',s)){if(g.complete===true&&g.is_full_piece===true)keys.add('sim-'+(g.simId||g.topic||g.id))}
 return keys.size;
 }
 function questionCount(s=state){
@@ -63,7 +63,7 @@ function setDay(date){if(!getDay(date))return;selectedDate=date;state.selectedDa
 function render(){
 if(!plan)return;
 const inf=levelInfo();const rank=rankFor(inf.level);
-setText('globalRank','RANK '+rank);setText('heroRank',rank);setText('heroXp',totalXp().toLocaleString('pt-BR')+' XP');setText('heroLevel','LV '+String(inf.level).padStart(2,'0'));
+setText('globalRank','RANK '+rank);setText('introFooter','PLAYER: WESLEY  |  RANK '+rank+'  |  A JORNADA COMEÇA AQUI');setText('heroRank',rank);setText('heroXp',totalXp().toLocaleString('pt-BR')+' XP');setText('heroLevel','LV '+String(inf.level).padStart(2,'0'));
 $('heroXpBar').style.width=Math.min(100,inf.current/inf.needed*100)+'%';
 setText('statMissions',numValid()+' / '+plan.missions.length);setText('statPieces',pieceCount()+' / 45');setText('statQuestions',questionCount()+' / 145');setText('statSims',simCount()+' / 15');
 const elapsed=Math.max(0,plan.days.findIndex(d=>d.date===today())+1);setText('heroDays','Dia '+(elapsed||'pré-temporada')+' / 119');
@@ -144,7 +144,7 @@ if(correction.length<10||!ref){notify('Registre a correção e sua referência.'
 const approved=f.elements.outcome.value==='validado',full=f.elements.is_full_piece.value==='true',without=f.elements.used_model.value==='false';
 if(approved&&full&&m.learning_stage==='autonomo'&&!confirm('Portão de prontidão demonstrado? Reconhecimento da peça e fase, artigo/prazo no Vade, estrutura completa e uma tese TBFP. Confirmar APENAS se essas etapas foram realmente avaliadas.'))return;
 if(approved&&m.type==='simulado_completo'&&full){notify('Para contabilizar simulado, registre separadamente o resultado da peça e das 4 discursivas em BOSS BATTLES.')}
-m.correction=correction;m.correction_ref=ref;m.status=approved?'Validada':'Ajustar';m.validated=approved;m.validated_date=approved?today():null;m.is_full_piece=approved&&full&&m.type!=='simulado_completo';m.used_model=!without;
+m.correction=correction;m.correction_ref=ref;m.status=approved?'Validada':'Ajustar';m.validated=approved;m.validated_date=approved?today():null;m.is_full_piece=approved&&full&&(!!m.piece_case_id||['peca_completa','treino_guiado_peca'].includes(m.type));m.used_model=!without;
 save();$('missionDialog').close();render();notify(approved?'Validação documentada e XP liberado.':'Nova tentativa necessária, sem punição.');
 }
 function recordGrade(e){
@@ -183,8 +183,8 @@ if(!confirm('O backup substituirá os registros locais da V3. Recomendamos expor
 const fresh=templateState();state={...fresh,...imported,reviewDone:imported.reviewDone||{}};mergePlan(plan);save();render();notify('Backup restaurado; IDs do plano atualizados sem duplicar.')}catch(e){notify('Não foi possível importar: '+e.message)}
 }
 function setupEvents(){
-$('enterBtn').addEventListener('click',()=>{const intro=$('intro');intro.classList.add('entering');document.body.classList.add('entered');setTimeout(()=>{intro.classList.add('hidden');$('pageTitle').focus?.()},870)});
-$('backToIntro').addEventListener('click',()=>{$('intro').classList.remove('hidden','entering');});
+$('enterBtn').addEventListener('click',()=>{const intro=$('intro');$('enterBtn').textContent='✓ ACESSO AUTORIZADO';intro.classList.add('entering');document.body.classList.add('entered');setTimeout(()=>{intro.classList.add('hidden');$('pageTitle').focus?.()},870)});
+$('backToIntro').addEventListener('click',()=>{$('intro').classList.remove('hidden','entering');$('enterBtn').textContent='✦   INICIAR DESPERTAR   ✦';});
 document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.page)));
 document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.goto)));
 document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>$(b.dataset.close).close()));

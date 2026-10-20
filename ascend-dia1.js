@@ -26,6 +26,14 @@ return '<details class="dia1-situation" data-case-panel="'+c.letter+'" '+(i===0?
 function diagnosticHTML(){
 return '<div class="dia1-intro"><span class="eyebrow">DIA 01 · IDENTIFICAÇÃO DE PEÇAS</span><h3>Seis histórias, seis tentativas</h3><p><strong>O “Caderno de Diagnóstico” está aqui mesmo.</strong> Não é outro PDF ou uma página escondida. Abra as situações A–F abaixo e escreva nos campos que aparecem em cada cartão.</p><p>O exercício não mede quantos você acertou de primeira. Ele mede se você já consegue reconhecer a fase e a medida processual. Você pode escrever <strong>“não sei”</strong> e marcar segurança 0.</p><div class="dia1-example"><strong>Exemplo de COMO responder (não é um dos seis casos):</strong><p><em>“O juiz apenas marcou uma audiência e comunicou a data às partes.”</em></p><dl><dt>Último ato/fase</dt><dd>Foi marcada uma audiência; ainda vai acontecer.</dd><dt>Peça ou medida</dt><dd>Não sei se preciso apresentar alguma peça.</dd><dt>Fundamento legal</dt><dd>Ainda não sei localizar.</dd><dt>Segurança</dt><dd>0 — não faço ideia.</dd><dt>Dúvida</dt><dd>Qual intimação exige uma manifestação escrita?</dd></dl></div><p class="dia1-caption">O exemplo mostra o <strong>formato</strong>, não é um gabarito. As respostas das seis situações não são mostradas antes de você tentar.</p></div><div class="dia1-progress" role="status"><span id="diag-progress">Rascunhos preenchidos: '+attemptedCount()+'/6</span><span>Salvo automaticamente neste navegador</span></div><div class="dia1-cards">'+cases.map(card).join('')+'</div><div class="dia1-finish"><p><strong>Depois de preencher A–F:</strong> copie as respostas para nossa conversa e peça a correção. O botão de salvar do ASCEND guarda sua tentativa <strong>neste navegador</strong>; ele não envia mensagens automaticamente ao ChatGPT.</p><div class="actions"><button class="btn primary" type="button" id="diag-copy">Copiar minhas seis respostas para a mentoria</button></div></div>';
 }
+const baseDaily=renderDaily;
+renderDaily=function(){
+ baseDaily();
+ if(selectedDate!=='2026-10-26')return;
+ const el=$('dailyMissions');
+ if(!el)return;
+ el.innerHTML='<div class="notice"><strong>ONDE FICAM OS 6 CASOS?</strong> Clique em <b>Abrir passo a passo</b> na primeira missão. Os seis casos A–F aparecem na própria tela, com campos para responder. Não há outro caderno ou PDF para procurar.</div>'+el.innerHTML;
+};
 const baseOpen=openMission;
 openMission=function(id){
 baseOpen(id);

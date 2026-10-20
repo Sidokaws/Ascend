@@ -138,13 +138,16 @@ $('theorySchedule').innerHTML=[...schedule.values()].map(ref=>{
  +'<div class="theory-file">'+errSafe(refLabel(ref))+'</div><div class="muted">45 min • '+errSafe(ref.path)+'</div><div class="muted"><b>Ordem:</b> '+errSafe(ref.timing)+'</div>'
  +'<button class="btn small-btn" style="margin-top:7px" data-open-mission="'+errSafe(m.id)+'">Abrir etapas</button></div>'+statusBadge(m)+'</div>';
 }).join('');
+const archives=Object.values(state.missions).filter(m=>m.theory_archived===true);
+if(archives.length)$('theorySchedule').innerHTML+='<details class="item"><summary>Histórico preservado: '+archives.length+' leitura(s) do plano anterior</summary>'
++archives.map(m=>'<p class="theory-note"><b>'+errSafe(m.title)+'</b> · '+errSafe(m.source||'')+' · '+(m.validated?'Validada na versão anterior':'Produção registrada')+' <button class="btn small-btn" data-open-mission="'+errSafe(m.id)+'">Ver registro</button></p>').join('')+'</details>';
 }
 const mainRender=render;
 render=function(){
 if(plan&&(!schedule||state.theoryPlanVersion!=='2.0-pedagogica'))syncReadings();
 mainRender();
 if(!plan||!schedule)return;
-setText('statMissions',numValid()+' / '+(plan.missions.length+schedule.size));
+const ids=[...plan.missions.map(m=>m.id),...[...schedule.keys()].map(d=>PREFIX+d.replace(/-/g,''))];const achieved=ids.filter(id=>state.missions[id]?.validated===true).length;setText('statMissions',achieved+' / '+ids.length);
 renderTab();
 };
 const dailyBase=renderDaily;

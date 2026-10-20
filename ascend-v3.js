@@ -25,6 +25,7 @@ state.legacyImported=true;save();
 }
 function mergePlan(data){
 if(!data||data.days?.length!==119||data.missions?.length!==274||Object.keys(data.question_catalog||{}).length!==100||Object.keys(data.piece_case_catalog||{}).length!==27||Object.keys(data.simulation_packages||{}).length!==15)throw Error('Plano v1.2 incompleto ou divergente');
+if(state.migration_disabled===true){plan=data;selectedDate=data.days.some(d=>d.date===state.selectedDate)?state.selectedDate:data.date_start;state.selectedDate=selectedDate;monthView=new Date(Number(selectedDate.slice(0,4)),Number(selectedDate.slice(5,7))-1,1);save();return;}
 const schema=data.schema_version;
 if(state.plan_version!==schema){
 try{

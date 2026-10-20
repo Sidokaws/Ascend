@@ -75,3 +75,11 @@ Uma importação de backup pede confirmação antes de substituir registros loca
 Espelhos com pontuação por item A/B e relatórios detalhados; confirmação oficial do edital/corte legislativo; auditoria das referências aos PDFs; testes adicionais em navegador e aparelho móvel. Sem integração com serviços externos ou chaves expostas.
 
 *Identidade gráfica original de fantasia sombria, sem reproduzir assets de terceiros.*
+
+## Dia 1 — diagnóstico orientado (ajuste de experiência)
+
+A primeira missão, `ASC-20261026-01`, apresenta agora o próprio **Caderno de Diagnóstico dentro da tela** (não é arquivo separado). Os seis casos do plano original A–F foram mantidos como versões curtas para conferência e receberam narrativas autorais contextualizadas na interface, sem divulgar respostas.
+
+Cada situação contém campos independentes para último ato/fase, peça/medida, fundamento opcional, confiança 0/1/2 e dúvida. É legítimo escrever **“não sei”**. Um exemplo neutro mostra como preencher, sem responder às seis situações. As tentativas são **rascunhos salvos no navegador** (`state.diagnosticoDia1Draft`), incluídos no backup V3; o usuário pode copiar seu texto para a conversa com o mentor.
+
+**Importante:** salvar a tentativa no painel não a envia automaticamente ao ChatGPT e não concede XP até registro de correção. Os arquivos `ascend-dia1.js` e `ascend-dia1.css` adicionam a experiência sem alterar o plano JSON original V1.2.

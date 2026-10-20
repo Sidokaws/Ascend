@@ -12,73 +12,43 @@ let schedule=null,sourcesTotal=0,segmentsTotal=0;
 const errSafe=safe,isoDate=d=>d.slice(0,10);
 function isStudyMaterial(name){return /^E-book|^Slides/i.test(name||'')&&/\.pdf$/i.test(name||'')}
 function makeSourcePlan(data){
-const books=new Map();
-for(const m of data.missions){
- for(const step of (m.step_by_step||[])){
-  for(const ref of (step.fontes||[])){
-   const name=ref.arquivo||'',pg=ref.paginas||[];
-   if(!isStudyMaterial(name)||pg.length!==2)continue;
-   const a=Number(pg[0]),b=Number(pg[1]);
-   if(!Number.isInteger(a)||!Number.isInteger(b)||a<1||b<a)continue;
-   if(!books.has(name))books.set(name,[]);
-   books.get(name).push({first:a,last:b,date:m.date});
-  }
- }
+const spec=window.ASCEND_PEDAGOGIA;
+if(!spec||spec.version!=='2.0-pedagogica'||spec.weeks.length!==17)throw Error('Curadoria pedagógica não foi carregada');
+const index=new Map();
+for(const m of data.missions)for(const step of m.step_by_step||[])for(const r of step.fontes||[]){
+const name=r.arquivo,span=r.paginas;if(!name||!Array.isArray(span)||span.length<2)continue;
+if(!index.has(name))index.set(name,[]);
+index.get(name).push([Number(span[0]),Number(span[1])]);
 }
-const entries=[];
-for(const [file,citations] of books){
- const spans=citations.map(x=>[x.first,x.last]).sort((a,b)=>a[0]-b[0]);
- const union=[];
- for(const [a,b] of spans){
-  const last=union.at(-1);
-  if(last&&a<=last[1]+1)last[1]=Math.max(last[1],b);
-  else union.push([a,b]);
- }
- for(const [lo,hi] of union){
-  for(let first=lo;first<=hi;first+=CHUNK){
-   const last=Math.min(first+CHUNK-1,hi);
-   const relevant=citations.filter(c=>c.first<=last&&c.last>=first);
-   const firstDate=(relevant.length?relevant:citations).map(x=>x.date).sort()[0];
-   entries.push({file,first,last,firstDate,kind:file.startsWith('Slides')?'Slides':'E-book',reinforcement:false});
-  }
- }
+const weekdays=data.days.filter(d=>!['sábado','domingo'].includes(d.weekday));
+if(weekdays.length!==85)throw Error('O plano não tem os 85 dias úteis esperados');
+const slots=new Map(),warnings=[],materialSet=new Set();
+for(let week=1;week<=17;week++){
+const config=spec.weeks[week-1],days=weekdays.filter(d=>d.week===week);
+if(!config||config.entries.length!==5||days.length!==5)throw Error('Semana '+week+' fora do cronograma');
+for(let i=0;i<5;i++){
+const item=config.entries[i],day=days[i],[title,path,token,timing]=item;
+const sources=token.split('+').map(expr=>{
+const parts=expr.match(/^([A-Za-z0-9]+):(\d+)-(\d+)$/);
+if(!parts)throw Error('Referência inválida: '+expr);
+const [,alias,a0,b0]=parts,first=Number(a0),last=Number(b0),file=spec.aliases[alias];
+if(!file)throw Error('Arquivo não identificado na curadoria: '+alias);
+const matches=index.get(file)||[];
+if(!matches.some(([lo,hi])=>first>=lo&&last<=hi)){
+warnings.push({day:day.date,file,pages:[first,last],error:'Trecho não localizado nas referências fornecidas'});
+return null;
 }
-entries.sort((a,b)=>a.firstDate.localeCompare(b.firstDate)||a.file.localeCompare(b.file,'pt-BR')||a.first-b.first);
-const weekdays=data.days.filter(d=>d.weekday!=='sábado'&&d.weekday!=='domingo');
-const slots=new Map();
-const free=weekdays.map(d=>d.date);
-for(const entry of entries){
- let i=free.findIndex(date=>date>=entry.firstDate);
- if(i<0)i=free.length-1;
- if(i<0)throw Error('Capacidade insuficiente para as leituras citadas no plano');
- const date=free.splice(i,1)[0];
- slots.set(date,{...entry,date,scheduledAhead:date<entry.firstDate});
+materialSet.add(file);
+return {file,first,last,kind:file.startsWith('Slides')?'Slides':'E-book'};
+}).filter(Boolean);
+if(!sources.length)throw Error('Leitura sem fonte verificada em '+day.date);
+if(sources.reduce((n,r)=>n+r.last-r.first+1,0)>18)warnings.push({day:day.date,error:'Faixa extensa: ajustar duração após observação'});
+slots.set(day.date,{date:day.date,week,weekTheme:config.theme,title,path,timing,sources,
+file:sources[0].file,first:sources[0].first,last:sources[0].last,kind:sources[0].kind,
+reinforcement:/reteste|recupera|revisão|consolid/i.test(title),version:spec.version});
 }
-for(const date of free){
- const choices=[...slots.values()].filter(x=>x.date<=date).sort((a,b)=>b.date.localeCompare(a.date));
- const chosen=choices[0]||entries[0];
- if(!chosen)continue;
- slots.set(date,{...chosen,date,firstDate:chosen.firstDate,reinforcement:true});
 }
-// Prefer that a day's deeper reading follows its main thematic theory/cobertura.
-const prioritized=['cobertura','teoria'];
-for(const day of weekdays){
- const goals=data.missions.filter(m=>m.date===day.date&&prioritized.includes(m.type));
- const targetFiles=[];
- for(const mission of goals)for(const part of mission.step_by_step||[])for(const r of part.fontes||[])
-  if(isStudyMaterial(r.arquivo)&&!targetFiles.includes(r.arquivo))targetFiles.push(r.arquivo);
- const selected=targetFiles.find(name=>[...slots.values()].some(x=>x.file===name));
- if(!selected)continue;
- const current=slots.get(day.date);
- if(current?.file===selected)continue;
- const other=[...slots.entries()].filter(([date,item])=>item.file===selected)
-  .sort((a,b)=>Math.abs(new Date(a[0]+'T12:00:00')-new Date(day.date+'T12:00:00'))-Math.abs(new Date(b[0]+'T12:00:00')-new Date(day.date+'T12:00:00')))[0];
- if(!other||!current)continue;
- const [otherDate,otherReading]=other;
- slots.set(day.date,{...otherReading,date:day.date,scheduledAhead:day.date<otherReading.firstDate});
- slots.set(otherDate,{...current,date:otherDate,scheduledAhead:otherDate<current.firstDate});
-}
-return {slots,books:books.size,segments:entries.length,weekdayCount:weekdays.length};
+return {slots,books:materialSet.size,segments:slots.size,weekdayCount:weekdays.length,warnings};
 }
 function topic(file){
 return file.replace(/^E-book-\s*Aulas\s*_\s*/,'').replace(/^Slides\s*_\s*/,'').replace(/\.pdf$/i,'').trim();

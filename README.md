@@ -103,3 +103,50 @@ A interface ganhou uma aba **Teoria: e-books e slides**, com:
 **Importante:** ler as *páginas citadas* não equivale a ler integralmente 51 PDFs; a auditoria definitiva de todo o material ainda aguarda a mensagem "finalizei os envios". Nesse momento deveremos catalogar páginas efetivas, complementar lacunas e ajustar volume real de teoria, e não alegar que o acervo inteiro já foi coberto.
 
 Arquivos implementados: \`ascend-teoria.js\`, \`ascend-teoria.css\`. A migração preserva dados existentes por ID estável e não hospeda os PDFs.
+
+## Sequência pedagógica auditada — versão 2.0 (19/10/2026)
+
+**Motivo da correção:** a primeira trilha teórica (v1.0) distribuía blocos de páginas por data de citação, o que podia colocar a teoria **depois** de uma questão que a pressupunha. Essa seleção automática foi substituída pela curadoria explícita em ascend-curriculo.js.
+
+Princípios implementados:
+1. **Pré-requisito antes da aplicação:** reconhecer os conceitos necessários e estudá-los antes das questões ou da peça, sem exigir conhecimento de estágio futuro. O 1º dia é especial: fazer o diagnóstico A–F primeiro, **sem pistas**; depois estudar ação penal/identificação e só então realizar as tarefas escritas do dia.
+2. **17 semanas progressivas:** blocos de Processo Penal e peças-base → recursos e execução → tipicidade/pena, teses e provas → Júri/JECRIM/legislação especial → prisão e remédios → consolidação.
+3. **Fontes verificadas:** 85 blocos de 45 min em dias úteis, cobrindo os 51 e-books/slides nominalmente citados na versão 1.2. Cada intervalo de páginas foi conferido contra fontes efetivamente indicadas no JSON fornecido. Isso **não** equivale à leitura integral dos 51 PDFs.
+4. **Uma tarefa legível:** aula/tema, por que vem agora, o que é pré-requisito, arquivo, páginas, minutos para leitura e produção esperada. O app realça primeiro a leitura teórica antes das questões relacionadas, exceto o diagnóstico inicial.
+5. **Três etapas no bloco de 45 min:** recuperação da base (5), estudo da fonte (27, dividido proporcionalmente entre leituras) e aplicação escrita (13). Ajustar se o material exigir mais tempo; não marcar leitura não realizada. As atividades práticas originais não foram excluídas.
+6. **Sem páginas inventadas para lacunas:** itens Q094 (administração pública), Q095 (trânsito) e Q096–Q100 (organização criminosa) exigem consulta ao Vade e complementação posterior. Onde não há e-book citado, **não simular um PDF**.
+7. **Respeito ao progresso:** IDs LEIT-YYYYMMDD permanecem, mas uma leitura antiga **com evidência ou validação**, substituída por outra fonte, é arquivada com seus dados e XP preservados sob LEITHIST-YYYYMMDD. A atividade da nova sequência surge pendente. Não conceder XP por mero clique/leitura passiva.
+8. **Carga:** 334 horas do plano original + 85 × 45 minutos = 397h45 previstas, sujeitas a ajuste. Sábados seguem sem tarefas. Domingos seguem o cronograma-base (recuperação/simulados) e não recebem carga teórica adicional.
+
+**Ressalva:** as 274 missões práticas do plano 1.2 continuam com as referências e durações originais. Em uma questão cujo tema ainda não foi aprofundado, a missão agora mostra o PDF de apoio e recomenda ler a base **antes** de escrever A/B, com tempo extra conforme o domínio. O inventário final dos mais de 50 PDFs completos continua condicionado a “finalizei os envios”.
+
+### Mapa das 17 semanas
+
+| Semana | Progressão | Exemplos de estudos |
+| --- | --- | --- |
+| 01 | Reconhecer a fase antes de escolher a peça | Processo, ação penal e diagnóstico; Sentença e recurso: interposição x razões |
+| 02 | Memoriais e RESE: decisão anterior ao recurso | Encerramento da instrução, Memoriais e ANPP; O que cabe nos Memoriais |
+| 03 | Execução, contraditório recursal e cautelares | Execução: fase, juízo e decisões; Agravo em execução e a decisão do juízo |
+| 04 | Da tipicidade à pena aplicada no recurso | Nexo causal e estrutura inicial da dosimetria; Dosimetria na Apelação |
+| 05 | Extinção da punibilidade e defesas pré-instrução | Rejeição da denúncia e desistência voluntária; Legitimidade e modalidades de ação penal |
+| 06 | Recursos e execução com teses aplicadas | Execução: progressão, remição e decisão; Contrarrazões aprofundadas |
+| 07 | Provas e Apelação — fundamentar o inconformismo | Teoria geral da prova; Razões de Apelação |
+| 08 | Nulidades e recursos integrativos | Nulidades: pressupostos e prejuízo; Provas ilícitas e contraditório |
+| 09 | JECRIM, ação privada e Queixa-Crime | Procedimento do JECRIM; JECRIM e ação penal |
+| 10 | Tribunal do Júri — primeira fase | Júri: procedimentos e filtros; Crimes contra a vida: classificação |
+| 11 | Tribunal do Júri — segunda fase e contrarrazões | Júri: resultado do plenário e recursos; Apelação do Júri: limites recursais |
+| 12 | Execução penal avançada e legislação especial | Execução: institutos e pressupostos; Execução: condições e cálculos |
+| 13 | Prisões, culpabilidade e Lei de Drogas | Prisão preventiva e cautelares; Culpabilidade e excludentes |
+| 14 | Assistente, funcionário público e concurso de pessoas | Concurso de pessoas; Defesa preliminar de funcionário público |
+| 15 | Medidas de liberdade e teoria penal complementar | Liberdade e prisão processual; Concurso de crimes |
+| 16 | Remédios e impugnações excepcionais | Revisão criminal e habeas corpus; Recurso Ordinário Constitucional |
+| 17 | Consolidação, correção de lacunas e prova | Apelação integral: fundamentos e pedidos; Memoriais: teses, pedidos e fecho |
+
+### Avisos de prova
+
+Calendário oficial da OAB, consultado em 19/10/2026: prova prático-profissional do 48º EOU prevista para **28/02/2027**, sujeita a alterações. Edital complementar para reaproveitamento da 1ª fase do 47º EOU previsto para 13/11/2026 e inscrição de 23 a 30/11/2026, sempre conferir o edital complementar e o site da FGV. Fonte: https://examedeordem.oab.org.br/Calendario
+
+### Auditoria técnica
+
+Foram validados contra o JSON V1.2: **119 dias**, **274 missões-base**, **85 blocos extras (5 por semana)**, **51 arquivos de leitura distintos**, **nenhuma referência de páginas faltante no roteiro curado**, **15 janelas de simulado de revisão**; todos os contadores de execução começam sem evidências presumidas. Fluxo de cópias de progresso testado para não reclassificar aulas anteriores.
+

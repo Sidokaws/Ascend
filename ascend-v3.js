@@ -49,7 +49,7 @@ plan=data;selectedDate=data.days.some(d=>d.date===state.selectedDate)?state.sele
 state.selectedDate=selectedDate;monthView=new Date(Number(selectedDate.slice(0,4)),Number(selectedDate.slice(5,7))-1,1);save();
 }
 function missions(){return Object.values(state.missions)}
-function dayMissions(date){return missions().filter(m=>m.date===date).sort((a,b)=>a.id.localeCompare(b.id))}
+function dayMissions(date){return missions().filter(m=>m.date===date&&m.type!=='leitura_teorica'&&m.theory_archived!==true).sort((a,b)=>a.id.localeCompare(b.id))}
 function numValid(s=state){return Object.values(s.missions||{}).filter(m=>m.validated===true).length}
 function validGrades(type,s=state){return (s.grades||[]).filter(g=>g.type===type&&g.confirmed===true)}
 function simCount(s=state){return new Set(validGrades('Simulado',s).filter(g=>g.complete===true&&g.is_full_piece===true).map(g=>g.simId||g.topic||g.id)).size}
@@ -99,7 +99,7 @@ if(state.timer?.missionId)$('timerMission').value=state.timer.missionId;
 function renderCalendar(){
 const y=monthView.getFullYear(),m=monthView.getMonth();setText('calMonth',monthView.toLocaleDateString('pt-BR',{month:'long',year:'numeric'}).toUpperCase());
 let html=['D','S','T','Q','Q','S','S'].map(d=>'<div class="cal-heading">'+d+'</div>').join('');const start=new Date(y,m,1).getDay();for(let i=0;i<start;i++)html+='<div class="cal-day empty"></div>';
-const days=new Date(y,m+1,0).getDate();for(let d=1;d<=days;d++){const iso=y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');const record=getDay(iso);const task=dayMissions(iso);const all=task.length>0&&task.every(a=>a.validated===true);html+='<button class="cal-day '+(record?.mode==='Descanso'?'rest ':'')+(selectedDate===iso?'selected ':'')+(all?'done-day':'')+'" data-date="'+iso+'" '+(!record?'disabled':'')+'>'+d+(record?.mode==='Descanso'?'<span class="muted tiny">DESC</span>':task.length?'<span class="tiny muted">'+task.filter(a=>a.validated).length+'/'+task.length+' missões</span>':'')+(record?.mode!=='Descanso'&&task.length?'<span class="dot"></span>':'')+'</button>'} $('calGrid').innerHTML=html;
+const days=new Date(y,m+1,0).getDate();for(let d=1;d<=days;d++){const iso=y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');const record=getDay(iso);const task=dayMissions(iso);const reading=state.missions['LEIT-'+iso.replace(/-/g,'')];const all=task.length>0&&task.every(a=>a.validated===true)&&(!reading||reading.validated===true);html+='<button class="cal-day '+(record?.mode==='Descanso'?'rest ':'')+(selectedDate===iso?'selected ':'')+(all?'done-day':'')+'" data-date="'+iso+'" '+(!record?'disabled':'')+'>'+d+(record?.mode==='Descanso'?'<span class="muted tiny">DESC</span>':task.length?'<span class="tiny muted">'+task.filter(a=>a.validated).length+'/'+task.length+' missões</span>':'')+(record?.mode!=='Descanso'&&task.length?'<span class="dot"></span>':'')+'</button>'} $('calGrid').innerHTML=html;
 const day=getDay(selectedDate);setText('calDayTitle',day?format(day.date)+' • '+day.topic:'Selecione um dia do plano');
 $('calDayDetails').innerHTML=day?'<p class="muted">'+safe(day.weekday)+' · Semana '+day.week+' · '+safe(day.phase)+'</p><p><span class="tag">'+safe(day.mode)+'</span> &nbsp; '+day.planned_hours+' horas planejadas</p><p class="muted">'+safe(day.notes||'')+'</p><hr><b>Atividades do dia</b>'+dayMissions(day.date).map(m=>'<p class="muted">• '+safe(m.title)+'</p>').join('')+'<details><summary>Referências (fornecidas no plano)</summary><p class="muted">'+safe(day.source||'')+'</p></details>':'';
 }

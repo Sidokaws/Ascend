@@ -135,6 +135,8 @@ const ref=schedule.get(selectedDate);if(!ref)return;
 const container=$('dailyMissions');
 const id=PREFIX+selectedDate.replace(/-/g,'');
 if(!container.innerHTML.includes(id))container.innerHTML+=thHtml(ref);
+const baseMinutes=Math.round((getDay(selectedDate)?.planned_hours||0)*60);
+container.innerHTML=container.innerHTML.replace(baseMinutes+' minutos previstos',baseMinutes+' min do roteiro + 45 min de teoria = '+(baseMinutes+45)+' min planejados');
 const heading=$('dayHeading');if(heading)heading.textContent+=' · +45 min estudo teórico (bloco complementar)';
 };
 const calendarBase=renderCalendar;
@@ -143,11 +145,5 @@ calendarBase();
 if(!schedule)return;
 const r=schedule.get(selectedDate);
 if(r){$('calDayDetails').innerHTML+='<div class="theory-banner"><b>Leitura adicional: +45 min</b><p>'+errSafe(topic(r.file))+' — p. '+r.first+'–'+r.last+'</p></div>';}
-};
-const gradeBase=renderGuide;
-renderGuide=function(m){
-let result=gradeBase(m);
-if(m?.type==='leitura_teorica')result='<div class="notice"><b>Leitura de verdade:</b> use o bloco de 45 min para compreender, não só percorrer páginas. Registrar conclusão depende da produção e correção do mentor.</div>'+result;
-return result;
 };
 })();

@@ -39,6 +39,7 @@ const rows=new Set();for(const m of data.missions){
  const old=state.missions[m.id]||{};const merged={...m};
  for(const k of progressFields)if(Object.prototype.hasOwnProperty.call(old,k)&&old[k]!=null)merged[k]=old[k];
  merged.validated=old.validated===true;
+ if(old.validated===true&&Number.isFinite(Number(old.xp_base)))merged.xp_base=Number(old.xp_base);
  merged.status=(old.validated===true||old.evidence||['Enviado para revisão','Ajustar'].includes(old.status))?(old.status||'Enviado para revisão'):'Pendente';
  if(!merged.evidence)merged.evidence='';
  state.missions[m.id]=merged;

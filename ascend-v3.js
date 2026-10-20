@@ -1,6 +1,6 @@
 
 'use strict';
-const PLAN_URL='./data/plano-oab48-119-dias-v1.1.json',KEY='ascendOab48V3',PREV='ascendOab48V2';
+const PLAN_URL='./data/plano-oab48-119-dias-v1.2.json',KEY='ascendOab48V3',PREV='ascendOab48V2';
 const stages=['Não avaliado','Reconhecimento','Estrutura guiada','Peça integral com consulta','Peça integral autônoma'];
 const pieceNames=['Apelação — procedimento comum','Memoriais — procedimento comum','Resposta à Acusação','RESE — Recurso em Sentido Estrito','Agravo em Execução','Contrarrazões de Apelação','Contrarrazões de RESE','Apelação — Tribunal do Júri','Memoriais — primeira fase do Júri','RESE — pronúncia','Apelação — JECRIM','Queixa-Crime','Queixa-Crime subsidiária','Habeas Corpus','Revisão Criminal','Liberdade Provisória','Relaxamento de Prisão','Revogação da Prisão Preventiva','Defesa Preliminar — Lei de Drogas','Defesa Preliminar — Funcionário Público','Embargos de Declaração','Embargos Infringentes e de Nulidade','Carta Testemunhável','Recurso Ordinário Constitucional','Mandado de Segurança Criminal','Recurso da Acusação / Assistente','Contrarrazões de Agravo em Execução','Outras medidas do edital'];
 const awards=[['✦','Primeiro passo','Uma missão validada',s=>numValid(s)>=1],['⛨','Disciplina crescente','Cinco missões validadas',s=>numValid(s)>=5],['⚔','Aprendiz das peças','Uma peça integral corrigida',s=>pieceCount(s)>=1],['◇','Fundamento sólido','Dez discursivas corrigidas',s=>questionCount(s)>=10],['♜','Caçador de bosses','Um simulado completo e corrigido',s=>simCount(s)>=1],['✧','Rotina sustentada','Trinta missões validadas',s=>numValid(s)>=30],['❖','Revisão consciente','Dez revisões realizadas com evidência',s=>Object.keys(s.reviewDone).length>=10],['✪','Rumo ao Rank S','Dez simulados completos',s=>simCount(s)>=10]];
@@ -24,8 +24,25 @@ old.missions.forEach(m=>{if(!m.id.startsWith('seed')||m.done){const id='v2-'+m.i
 state.legacyImported=true;save();
 }
 function mergePlan(data){
-if(!data||data.days?.length!==119||data.missions?.length!==274)throw Error('Plano inesperado: conferência de 119 dias e 274 missões falhou');
-const rows={};for(const m of data.missions){if(rows[m.id])throw Error('ID repetido '+m.id);rows[m.id]=true;const old=state.missions[m.id]||{};state.missions[m.id]={...m,...old,id:m.id,source:m.source,notes:m.notes,validated:old.validated===true,status:old.status||'Pendente',evidence:old.evidence||'',correction:old.correction||''}}
+if(!data||data.days?.length!==119||data.missions?.length!==274||Object.keys(data.question_catalog||{}).length!==100||Object.keys(data.piece_case_catalog||{}).length!==27||Object.keys(data.simulation_packages||{}).length!==15)throw Error('Plano v1.2 incompleto ou divergente');
+const schema=data.schema_version;
+if(state.plan_version!==schema){
+try{
+const key='ascendOab48V3_PreMigration_v12';
+if(!localStorage.getItem(key))localStorage.setItem(key,JSON.stringify({savedAt:new Date().toISOString(),state}));
+}catch(e){notify('Backup automático local indisponível: exporte seus dados antes de continuar.');}
+}
+const progressFields=['validated','status','evidence','evidence_link','actual_minutes','correction','correction_ref','learning_stage','is_full_piece','used_model','submitted_at','validated_date','grade','gross_seconds','pause_seconds','effective_seconds','release_state','release_reference','released_at','adapted_simulation','piece_case_result'];
+const rows=new Set();for(const m of data.missions){
+ if(rows.has(m.id))throw Error('ID de missão duplicado: '+m.id);rows.add(m.id);
+ const old=state.missions[m.id]||{};const merged={...m};
+ for(const k of progressFields)if(Object.prototype.hasOwnProperty.call(old,k)&&old[k]!=null)merged[k]=old[k];
+ merged.validated=old.validated===true;
+ merged.status=(old.validated===true||old.evidence||['Enviado para revisão','Ajustar'].includes(old.status))?(old.status||'Enviado para revisão'):'Pendente';
+ if(!merged.evidence)merged.evidence='';
+ state.missions[m.id]=merged;
+}
+state.plan_version=schema;
 plan=data;selectedDate=data.days.some(d=>d.date===state.selectedDate)?state.selectedDate:(data.days.some(d=>d.date===today())?today():data.date_start);
 state.selectedDate=selectedDate;monthView=new Date(Number(selectedDate.slice(0,4)),Number(selectedDate.slice(5,7))-1,1);save();
 }

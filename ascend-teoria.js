@@ -54,29 +54,38 @@ function topic(file){
 return file.replace(/^E-book-\s*Aulas\s*_\s*/,'').replace(/^Slides\s*_\s*/,'').replace(/\.pdf$/i,'').trim();
 }
 function stableReading(ref){
-const base=ref.kind==='Slides'?'Leitura de slides':'Estudo de e-book';
-const title=(ref.reinforcement?'Reteste teórico: ':base+': ')+topic(ref.file)+(ref.reinforcement?'':'');
+const title='TEORIA • '+ref.title;
 const id=PREFIX+ref.date.replace(/-/g,'');
-const label=ref.file+', p. '+ref.first+'–'+ref.last;
-const steps=ref.reinforcement?[
- {'minutos':5,'instrução':'Sem consultar o material, escreva o que consegue lembrar do tema, inclusive o que ainda confunde. Não basta reler passivamente.','fontes':[]},
- {'minutos':25,'instrução':'Releia criticamente '+label+'. Compare os pontos que esqueceu, as hipóteses de incidência, a base legal e as exceções relevantes. Não invente artigos.','fontes':[{arquivo:ref.file,paginas:[ref.first,ref.last],referencia:label}]},
- {'minutos':15,'instrução':'Produza uma síntese de cinco linhas, localize dois fundamentos no Vade e redija um micro-TBFP com exemplo seu. Registre as dúvidas para o mentor.','fontes':[]}
-]:[
- {'minutos':5,'instrução':'Faça uma pré-leitura: identifique qual tópico será estudado e anote uma dúvida ou conhecimento prévio.','fontes':[]},
- {'minutos':30,'instrução':'ESTUDAR TEORIA, sem apressar para responder questões: leia '+label+'. Marque conceitos, requisitos, exceções, prazos, teses e fundamentos que o material realmente apresentar. Se não concluir, anote a página atingida e continue depois.','fontes':[{arquivo:ref.file,paginas:[ref.first,ref.last],referencia:label}]},
- {'minutos':10,'instrução':'Feche o PDF. Em cinco linhas próprias, explique o conteúdo, identifique ao menos dois dispositivos para conferir no Vade, e escreva uma aplicação ou uma dúvida objetiva. Envie ao mentor para revisão, sem alegar que leu páginas não concluídas.','fontes':[]}
+const citations=ref.sources.map(r=>({arquivo:r.file,paginas:[r.first,r.last],referencia:r.file+', p. '+r.first+'–'+r.last}));
+const refsLabel=citations.map(x=>x.referencia).join('; ');
+const prereq=ref.path;
+const start=ref.date==='2026-10-26'
+ ?'Primeiro resolva os seis casos diagnósticos A–F, sem consultar a teoria. Depois inicie esta leitura, antes da Q003.'
+ :'Antes de abrir o PDF, recupere de memória a ideia da etapa anterior: '+prereq+'. Se não souber, escreva a dúvida e prossiga com a leitura guiada.';
+const studyTime=27,parts=ref.sources.length;
+let left=studyTime;
+const readingSteps=ref.sources.map((r,i)=>{
+const minutes=i===parts-1?left:Math.max(8,Math.floor(studyTime*(r.last-r.first+1)/ref.sources.reduce((n,x)=>n+x.last-x.first+1,0)));
+left-=minutes;
+const reference=r.file+', p. '+r.first+'–'+r.last;
+return {minutos:minutes,instrução:'ESTUDO COMPREENSIVO: leia '+reference+'. Identifique as condições, consequências e exceções relevantes; registre as páginas realmente lidas. Não avance se faltar compreensão; use o tempo medido e continue o trecho no próximo encontro se necessário.',fontes:[{arquivo:r.file,paginas:[r.first,r.last],referencia:reference}]};
+});
+const steps=[
+{minutos:5,instrução:start,fontes:[]},
+...readingSteps,
+{minutos:13,instrução:'Feche os materiais. Explique o ponto central com palavras próprias em cinco linhas. Confira ao menos dois fundamentos no Vade Mecum (se aplicáveis ao conteúdo) e redija uma aplicação aos fatos pelo TBFP ou uma dúvida concreta. Não veja padrões de resposta antes da tentativa.',fontes:[]}
 ];
-return {id,day_id:ref.date,type:'leitura_teorica',date:ref.date,title,summary_title:title,
-source:label,step_by_step:steps,duration_min:MINUTES,xp_base:30,
+return {id,day_id:'D'+String(1+Math.round((new Date(ref.date+'T12:00:00')-new Date('2026-10-26T12:00:00'))/86400000)).padStart(3,'0'),
+type:'leitura_teorica',date:ref.date,title,summary_title:ref.title,source:refsLabel,step_by_step:steps,duration_min:MINUTES,xp_base:30,
 validated:false,status:'Pendente',evidence:'',
-learning_stage:'leitura_aprofundada',stage:'Estudo teórico',
-evidence_required:'Registrar páginas REALMENTE lidas, síntese com palavras próprias, pelo menos dois fundamentos consultados no Vade e uma aplicação TBFP/dúvida. Se não concluir a faixa, registrar apenas o que fez.',
-deliverable:'Ficha de teoria: arquivo, páginas efetivamente lidas, cinco linhas de síntese, dois artigos localizados, uma aplicação TBFP e dúvida pendente.',
-success_condition:'Compreensão e recuperação ativa demonstradas por texto próprio, corrigido pelo mentor. Não contar livro inteiro por trecho lido.',
-teacher_note:'Bloco complementar às 334 horas base; 45 min estimados, registrar tempo efetivo e estender se necessário. Leitura isolada não demonstra domínio da matéria.',
-sources_detailed:[{arquivo:ref.file,paginas:[ref.first,ref.last],referencia:label}],
-theory_kind:ref.kind,theory_reinforcement:ref.reinforcement,reading_source:ref.file,reading_pages:[ref.first,ref.last],reading_schedule_version:'1.0'};
+stage:'Estudo teórico em sequência',learning_stage:'leitura_aprofundada',
+evidence_required:'Resumo autoral, páginas realmente lidas, fundamentos localizados no Vade e aplicação TBFP/dúvida. Conteúdo apenas visualizado não conta como dominado.',
+deliverable:'Ficha de leitura: '+ref.title+' — páginas realizadas, cinco linhas de síntese, fundamentos e miniaplicação.',
+success_condition:'Evidência escrita e correção, demonstrando compreensão do pré-requisito e do assunto. Não é necessário concluir o PDF inteiro.',
+teacher_note:'Encadeamento pedagógico: '+ref.path+'. Ordem no dia: '+ref.timing+'. 45 min adicionais aos exercícios originais, com ajuste de tempo conforme desempenho.',
+sources_detailed:citations,prerequisites:ref.path,theory_timing:ref.timing,theory_week_theme:ref.weekTheme,
+theory_kind:ref.sources.map(r=>r.kind).join(' + '),theory_reinforcement:ref.reinforcement,
+reading_source:ref.file,reading_pages:[ref.first,ref.last],reading_schedule_version:'2.0-pedagogica'};
 }
 function syncReadings(){
 if(!plan)return;

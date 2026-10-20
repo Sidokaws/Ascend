@@ -55,11 +55,11 @@ window.ASCEND_PEDAGOGIA = {
    ['Nulidades e insignificância: premissas','Fato processual → prejuízo; tipicidade → insignificância','nul:5-10+insig:5-8','Antes das discursivas Q011 e Q026']
   ]},
   {theme:'Memoriais e RESE: decisão anterior ao recurso',entries:[
-   ['Encerramento da instrução e Memoriais','Instrução → alegações finais → sentença','mem:3-10','Antes da comparação Memoriais x RESE'],
+   ['Encerramento da instrução, Memoriais e ANPP','Instrução → alegações finais; requisitos mínimos do ANPP','mem:3-10+anpp:5-8','Antes da comparação Memoriais x RESE e da Q001'],
    ['O que cabe nos Memoriais','Encerramento probatório → tese TBFP → pedido','mem:11-15','Antes da produção escrita P017'],
    ['Pronúncia e primeira fase do Júri','Decisão de pronúncia → RESE; não confundir plenário','reseJ:17-26','Antes da comparação e da primeira oficina de RESE'],
    ['Hipóteses de cabimento do RESE','Identificar decisão recorrível antes de redigir','rese:5-14','Antes da oficina do RESE'],
-   ['Prescrição e ANPP: fundamentos de base','Fatos, marcos e punibilidade → resultado jurídico','pres:5-12+anpp:5-8','Antes da Q051 e do estudo complementar de ação penal']
+   ['Prescrição penal: fundamentos e marcos','Fatos, marcos e punibilidade → resultado jurídico','pres:5-12','Antes da Q051; ANPP foi introduzido na segunda-feira']
   ]},
   {theme:'Execução, contraditório recursal e cautelares',entries:[
    ['Execução: fase, juízo e decisões','Sentença definitiva → execução → decisão atacável','exec:14-25','Antes da identificação de Agravo'],
@@ -76,9 +76,9 @@ window.ASCEND_PEDAGOGIA = {
    ['Teoria da pena e trânsito: aplicação','Três fases → pedido subsidiário; trânsito: fonte no Vade','pena:5-14','Para Q095, consultar CTB no Vade; não há apostila própria']
   ]},
   {theme:'Extinção da punibilidade e defesas pré-instrução',entries:[
-   ['Rejeição da denúncia e ação penal','Condições de ação → admissibilidade → defesa escrita','reje:5-10+anpp:5-8','Antes da comparação RA x RESE'],
+   ['Rejeição da denúncia e desistência voluntária','Condições de ação → admissibilidade; conduta/resultado → desistência','reje:5-8+desist:5-9','Antes da comparação RA x RESE e da Q030'],
    ['Legitimidade e modalidades de ação penal','Ação pública/privada → legitimidade → peça','acao:5-12','Antes de ampliar teses da Resposta à Acusação'],
-   ['Desistência voluntária e arrependimento eficaz','Iter criminis → desistência → consequências jurídicas','desist:5-13','Antes da Q031'],
+   ['Desistência voluntária e arrependimento eficaz','Iter criminis → desistência → consequências jurídicas','desist:10-13','Revisão e aprofundamento antes da Q031'],
    ['Arrependimento posterior','Distinguir hipóteses semelhantes → redução de pena','arre:5-10','Antes da Q032'],
    ['Prescrição: marcos e efeitos no processo','Cálculo de prazo → extinção → recurso adequado','pres:9-19','Consolidar os marcos vistos na semana 2']
   ]},

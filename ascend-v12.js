@@ -157,11 +157,11 @@ setTimeout(()=>URL.revokeObjectURL(url.split('#')[0]),60000);e.target.value='';p
 $('questionCatalogSearch')?.addEventListener('input',e=>renderQuestionCatalog(e.target.value));
 $('pieceCatalogSearch')?.addEventListener('input',e=>renderPieceCatalog(e.target.value));
 $('undoV12Btn')?.addEventListener('click',()=>{
-if(state.migration_disabled===true){if(!confirm('Reaplicar o plano executável V1.2, preservando os registros atuais?'))return;state.migration_disabled=false;delete state.plan_version;mergePlan(plan);render();notify('V1.2 reaplicada com registros preservados.');return}
+if(state.migration_disabled===true){if(!confirm('Reaplicar o plano executável V1.2, preservando os registros atuais?'))return;state.migration_disabled=false;delete state.plan_version;mergePlan(plan);render();$('undoV12Btn').textContent='↶ Desfazer migração V1.2';notify('V1.2 reaplicada com registros preservados.');return}
 let old;try{old=JSON.parse(localStorage.getItem('ascendOab48V3_PreMigration_v12'))}catch{}
 if(!old?.state){notify('Não há cópia local anterior à migração neste navegador.');return}
 if(!confirm('Restaurar o estado anterior à migração V1.2 neste navegador? Faça backup atual antes: alterações posteriores poderão ser perdidas.'))return;
-state={...old.state,migration_disabled:true};save();render();notify('Estado anterior restaurado. Reaplicação V1.2 suspensa neste navegador.');
+state={...old.state,migration_disabled:true};save();render();$('undoV12Btn').textContent='↻ Reaplicar instruções V1.2';notify('Estado anterior restaurado. Reaplicação V1.2 suspensa neste navegador.');
 });
 }
 document.addEventListener('DOMContentLoaded',()=>{

@@ -60,6 +60,24 @@ for(const date of free){
  if(!chosen)continue;
  slots.set(date,{...chosen,date,firstDate:chosen.firstDate,reinforcement:true});
 }
+// Prefer that a day's deeper reading follows its main thematic theory/cobertura.
+const prioritized=['cobertura','teoria'];
+for(const day of weekdays){
+ const goals=data.missions.filter(m=>m.date===day.date&&prioritized.includes(m.type));
+ const targetFiles=[];
+ for(const mission of goals)for(const part of mission.step_by_step||[])for(const r of part.fontes||[])
+  if(isStudyMaterial(r.arquivo)&&!targetFiles.includes(r.arquivo))targetFiles.push(r.arquivo);
+ const selected=targetFiles.find(name=>[...slots.values()].some(x=>x.file===name));
+ if(!selected)continue;
+ const current=slots.get(day.date);
+ if(current?.file===selected)continue;
+ const other=[...slots.entries()].filter(([date,item])=>item.file===selected)
+  .sort((a,b)=>Math.abs(new Date(a[0]+'T12:00:00')-new Date(day.date+'T12:00:00'))-Math.abs(new Date(b[0]+'T12:00:00')-new Date(day.date+'T12:00:00')))[0];
+ if(!other||!current)continue;
+ const [otherDate,otherReading]=other;
+ slots.set(day.date,{...otherReading,date:day.date,scheduledAhead:day.date<otherReading.firstDate});
+ slots.set(otherDate,{...current,date:otherDate,scheduledAhead:otherDate<current.firstDate});
+}
 return {slots,books:books.size,segments:entries.length,weekdayCount:weekdays.length};
 }
 function topic(file){

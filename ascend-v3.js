@@ -74,7 +74,7 @@ function notify(t){const el=$('snackbar');el.textContent=t;el.classList.remove('
 function setText(id,v){const el=$(id);if(el)el.textContent=v}
 function setTab(tab){
 currentTab=tab;document.querySelectorAll('[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===tab));document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='page-'+tab));
-const labels={dashboard:['PLAYER STATUS // OAB 48','Painel de evolução'],calendar:['TACTICAL MAP','Cronograma completo'],pieces:['ARSENAL // PEÇAS','Matriz de domínio'],questions:['TRAINING // TBFP','Desafios discursivos'],sims:['DUNGEONS // BOSSES','Simulados completos'],reviews:['RECOVERY PROTOCOL','Revisões e erros'],awards:['SYSTEM REWARDS','Conquistas'],settings:['SYSTEM CONTROL','Configurações e dados']};
+const labels={dashboard:['PLAYER STATUS // OAB 48','Painel de evolução'],calendar:['TACTICAL MAP','Cronograma completo'],theory:['KNOWLEDGE PATH','Teoria e materiais'],pieces:['ARSENAL // PEÇAS','Matriz de domínio'],questions:['TRAINING // TBFP','Desafios discursivos'],sims:['DUNGEONS // BOSSES','Simulados completos'],reviews:['RECOVERY PROTOCOL','Revisões e erros'],awards:['SYSTEM REWARDS','Conquistas'],settings:['SYSTEM CONTROL','Configurações e dados']};
 setText('pageEyebrow',labels[tab][0]);setText('pageTitle',labels[tab][1]);render();window.scrollTo({top:0,behavior:'smooth'});
 }
 function getDay(date){return plan?.days.find(d=>d.date===date)}

@@ -29,7 +29,7 @@ window.ASCEND_PEDAGOGIA = {
   jecrim:'E-book- Aulas _ Juizado Especial Criminal.pdf',
   queixa:'E-book- Aulas _ Queixa-crime. Queixa-crime subsidiária.pdf',
   honra:'E-book- Aulas _ Crimes contra a honra .pdf',
-  jurif:'E-book- Aulas _ 1ª Fase do Júri. Memoriais do Júri. Recurso em Sentido Estrito contra a decisão de pronúncia.pdf',
+  jurif:'E-book- Aulas _ 1ª Fase do Júri. Memoriais do Júri. Recurso em Sentido Estrito contra decisão de pronúncia.pdf',
   juria:'E-book- Aulas _ 2ª fase do Júri. Apelação do Júri.pdf',
   vida:'E-book- Aulas _ Crimes contra a vida.pdf',carta:'E-book- Aulas _ Cara Testemunhável.pdf',
   contraR:'E-book- Aulas _ Contrarrazões de Recurso em Sentido Estrito.pdf',

@@ -50,6 +50,21 @@ if(correctedDependency(m))return '<div class="v12-locked"><h4>⛨ Correção blo
 if(secretSim(m))return '<div class="v12-locked"><h4>♜ PORTÃO DE PRONTIDÃO</h4><p>Este é um simulado de revisão. Antes de revelar os casos, confirme que o mentor avaliou sua prontidão. Se não houver prontidão, transforme a sessão em oficina guiada; ela não contará como simulado integral.</p><div class="actions"><button type="button" class="btn primary" data-release-mode="full" data-release-id="'+esc(m.id)+'">Iniciar com liberação da mentoria</button><button type="button" class="btn" data-release-mode="guided" data-release-id="'+esc(m.id)+'">Adaptar para oficina guiada</button></div><p class="v12-note">A liberação é um registro manual: o aplicativo não verifica automaticamente o mentor.</p></div>';
 out+='<div class="v12-summary"><div><span class="eyebrow">TEMPO PREVISTO</span><strong>'+esc(m.duration_min)+' minutos</strong></div><div><span class="eyebrow">ETAPA DE APRENDIZAGEM</span><strong>'+esc(m.stage||m.learning_stage||'Oficina')+'</strong></div></div>';
 if(m.requires_readiness_gate)out+='<div class="notice">Portão de prontidão: reconhecimento, Vade, estrutura e TBFP devem ser demonstrados antes de treino autônomo. Se necessário, utilize modelo e registre como oficina guiada.</div>';
+if(m.type==='discursiva'){
+ const match=String(m.question_ids||m.title).match(/Q\d{3}/);
+ const entry=match&&plan.question_catalog?.[match[0]];
+ if(entry){
+ const citation=entry.fonte_teoria;
+ out+='<div class="v12-objective"><span class="eyebrow">PRÉ-REQUISITO ANTES DA RESPOSTA</span><p>Assunto: <b>'+esc(entry.tema)+'</b>. Revise a teoria e localize o fundamento no Vade antes de escrever A/B. Escreva pelo TBFP; NÃO consulte o padrão antes de enviar.</p>'
+ +(citation?.arquivo?htmlSrc(citation):'<p class="v12-phrase">Não há apostila específica indicada no acervo para esta questão; utilize o Vade Mecum. Não inventamos páginas.</p>')
+ +'<p class="v12-note">O tempo desta questão no plano-base inclui consulta orientada, mas, se não compreender, amplie a leitura ou peça explicação ao mentor. Não avance apenas para cumprir o cronômetro.</p></div>';
+ }
+}
+if(m.type==='leitura_teorica'&&m.prerequisites){
+ out+='<div class="v12-objective"><span class="eyebrow">POR QUE ESTUDAR ISSO AGORA?</span><p><b>Pré-requisito e sequência:</b> '+esc(m.prerequisites)+'</p>'
+ +'<p><b>Quando fazer:</b> '+esc(m.theory_timing||'Antes dos exercícios relacionados')+'</p>'
+ +'<p class="v12-note">Comece identificando a etapa anterior. Não memorize artigo sem compreender quando ele se aplica.</p></div>';
+}
 if(m.type==='diagnostico')out+=diagnosisHtml();
 if(m.piece_case_id&&m.type!=='simulado_completo')out+=caseHtml(m);
 if(m.type==='simulado_completo')out+=packageHtml(m);

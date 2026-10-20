@@ -137,3 +137,15 @@ Foram validados contra o JSON V1.2: **119 dias**, **274 missões-base**, **85 bl
 
 
 Roteiro auditável para baixar/conferir: [85 leituras com arquivo, páginas, pré-requisito, ordem e tempo](data/trilha-teorica-pedagogica-v2.csv).
+
+## Protocolo de qualidade e prioridades (19/10/2026)
+
+- **Seis prioridades de domínio integral:** Apelação, Memoriais, Resposta à Acusação, RESE, Agravo em Execução e Contrarrazões. Demais modalidades: cobertura sistemática por reconhecimento, fundamento e exercício escrito na intensidade definida pelo diagnóstico; não excluir peças.
+- **Peças históricas da FGV:** uma peça de prova antiga ainda não tentada pelo estudante é *primeiro contato* para ele, independentemente de já ter caído. O app permite registrar separadamente primeiro contato/revisão dos 27 casos de treino; não assume origem oficial não verificada.
+- **Correção existente:** 34 sessões de 45 min (= 25h30), preservadas do arquivo v1.2.
+- **Novos blocos**: 34 × 15 min de reescrita dirigida (= 8h30) e 14 × 60 min de triagem pós-simulado, no dia seguinte e somente após realmente produzir (= 14h). Total suplementar condicional 22h30.
+- **Carga potencial:** 334h originais + 63h45 teoria + 22h30 correção = **420h15**. Em sobrecarga, replanejar sem empilhar. A última janela SIM-15 (21/02) deve ser **preferencialmente revisão pré-Turbo**, sem correção postergada aos dias 22–27/02.
+- **Qualidade do espelho:** diferenciar FGV oficial de padrão CEISC e espelho pedagógico autoral, sem falsificar nota ou natureza do documento.
+- **Dados:** registros suplementares e exposição a casos ficam no navegador; não há XP sem produção avaliada.
+
+[Manual de correção, exposição e prioridades](docs/protocolo-correcao-prioridades-v1.md). Nova aba do app: **Correção e prioridades**.

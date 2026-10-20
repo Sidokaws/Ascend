@@ -48,10 +48,11 @@ const weekdays=data.days.filter(d=>d.weekday!=='sábado'&&d.weekday!=='domingo')
 const slots=new Map();
 const free=weekdays.map(d=>d.date);
 for(const entry of entries){
- const i=free.findIndex(date=>date>=entry.firstDate);
+ let i=free.findIndex(date=>date>=entry.firstDate);
+ if(i<0)i=free.length-1;
  if(i<0)throw Error('Capacidade insuficiente para as leituras citadas no plano');
  const date=free.splice(i,1)[0];
- slots.set(date,{...entry,date});
+ slots.set(date,{...entry,date,scheduledAhead:date<entry.firstDate});
 }
 for(const date of free){
  const choices=[...slots.values()].filter(x=>x.date<=date).sort((a,b)=>b.date.localeCompare(a.date));
@@ -116,7 +117,7 @@ const count=sourceCounts();const done=[...schedule.keys()].filter(date=>state.mi
 $('theoryOverview').innerHTML='<div class="theory-metrics"><div class="theory-metric"><small>E-BOOKS MENCIONADOS NO PLANO</small><strong>'+count.books+'</strong><small>Não equivale ao acervo total</small></div><div class="theory-metric"><small>CONJUNTOS DE SLIDES REFERENCIADOS</small><strong>'+count.slides+'</strong><small>Faixas de páginas citadas</small></div><div class="theory-metric"><small>BLOCOS DE LEITURA</small><strong>'+done+' / '+schedule.size+'</strong><small>45 min cada; evidência e validação</small></div><div class="theory-metric"><small>CARGA TOTAL PROPOSTA</small><strong>397h45</strong><small>334h base + 63h45 teoria</small></div></div><div class="theory-intro"><strong>Importante:</strong><p class="theory-note">Esta trilha trata das <b>faixas de páginas citadas</b> na versão 1.2. Não é inventário concluído, nem afirma que todos os arquivos e páginas enviados foram estudados. Após “finalizei os envios”, auditar o acervo completo para cobrir o que faltar. Se o dia estiver pesado, remanejar a leitura sem empilhar tarefas.</p></div>';
 $('theorySchedule').innerHTML=[...schedule.values()].map(ref=>{
  const m=state.missions[PREFIX+ref.date.replace(/-/g,'')];
- return '<div class="theory-row"><b>'+format(ref.date)+'</b><div><strong>'+errSafe(topic(ref.file))+'</strong><div class="theory-file">'+errSafe(ref.file)+'</div><div class="muted">p. '+ref.first+'–'+ref.last+' · '+MINUTES+' min · '+(ref.reinforcement?'Recuperação ativa':'Leitura estruturada')+'</div><button class="btn small-btn" style="margin-top:7px" data-open-mission="'+errSafe(m.id)+'">Abrir leitura</button></div>'+statusBadge(m)+'</div>';
+ return '<div class="theory-row"><b>'+format(ref.date)+'</b><div><strong>'+errSafe(topic(ref.file))+'</strong><div class="theory-file">'+errSafe(ref.file)+'</div><div class="muted">p. '+ref.first+'–'+ref.last+' · '+MINUTES+' min · '+(ref.reinforcement?'Recuperação ativa':ref.scheduledAhead?'Estudo antecipado':'Leitura estruturada')+'</div><button class="btn small-btn" style="margin-top:7px" data-open-mission="'+errSafe(m.id)+'">Abrir leitura</button></div>'+statusBadge(m)+'</div>';
 }).join('');
 }
 const mainRender=render;

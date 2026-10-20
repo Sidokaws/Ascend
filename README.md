@@ -1,4 +1,4 @@
-# SYSTEM // ASCEND — OAB 48 · V3
+# SYSTEM // ASCEND — OAB 48 · V3 + roteiro executável V1.2
 
 Aplicativo de treinamento gamificado da 2ª fase da OAB em Direito Penal, com tela de despertar, níveis, missões, matriz de peças, discursivas, simulados e revisões.
 
@@ -14,11 +14,30 @@ Publicação pelo GitHub Pages a partir da branch main e pasta raiz.
 
 | Original | Repositório | Papel |
 | --- | --- | --- |
-| OAB48_ASCEND_Plano_119_Dias_v1_1(2).json | data/plano-oab48-119-dias-v1.1.json | **Fonte de verdade** |
+| OAB48_ASCEND_Plano_119_Dias_v1_2_EXECUTAVEL(2).json | data/plano-oab48-119-dias-v1.2.json | **Fonte de verdade** |
 | OAB48_ASCEND_Missoes_119_Dias_v1_1(1).csv | data/missoes-oab48-v1.1.csv | Referência tabular |
 | OAB48_Guia_ASCEND_Progressao_v1_1(1).md | docs/protocolo-progressivo-v1.1.md | Protocolo pedagógico |
 
-Plano: **119 dias, 274 missões com IDs únicos, 15 janelas condicionais de simulado e 334 horas previstas**. O CSV traz os mesmos IDs; não se duplica atividade.
+Plano: **119 dias, 274 missões com IDs únicos, 15 janelas condicionais de simulado, 334 horas previstas, 100 questões Q001–Q100 e 27 peças P001–P027**. O CSV traz os mesmos IDs; não se duplica atividade.
+
+## Atualização executável V1.2 (19/10/2026)
+
+Arquivo principal: data/plano-oab48-119-dias-v1.2.json. Os dados incluem passo a passo de **todas as 274 missões**, tempo individual, materiais e páginas, entrega, critério de sucesso e notas pedagógicas. Módulo adicional: ascend-v12.js e ascend-v12.css.
+
+Arquivos originais preservados:
+- docs/guia-migracao-v1.2.md
+- docs/roteiro-diario-119-dias-v1.2.md
+- data/plano-oab48-119-dias-v1.1.json (versão anterior)
+
+Funcionalidades novas: missões com roteiro detalhado; diagnóstico com enunciados completos A–F; seis casos autorais (não FGV); busca de 100 questões e 27 casos; seleção manual de PDFs originais (sem publicar material protegido); autorização manual de início e revelação de pacotes de simulado; distinção entre treino guiado e integral; backup automático local pré-migração e opção para desfazer.
+
+### Limites
+
+- Os enunciados de Q001–Q100 e P001–P027 dependem dos PDFs originais, que não são hospedados pelo aplicativo. O site mostra ID, nome e página do material, e permite selecionar o PDF local. Não inventa transcrições.
+- O JSON é público no GitHub Pages, portanto o bloqueio dos simulados evita a revelação na interface normal, mas **não é sigilo criptográfico**. São pacotes de revisão já existentes, não inéditos.
+- Liberações, revisões e correções são registradas manualmente; não há validação automática pelo ChatGPT.
+- Atualização mantém ID, data, evidências, textos, notas, tempo, erros, XP já ganho e outros registros compatíveis. Uma cópia do estado anterior é guardada na chave local ascendOab48V3_PreMigration_v12, com opção de restauração na interface. O usuário deve exportar seu próprio backup JSON antes de reverter.
+- A data-alvo, regras de consulta e corte legislativo devem ser confirmados em fonte oficial.
 
 ## Regras de execução
 

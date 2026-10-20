@@ -91,35 +91,57 @@ function syncReadings(){
 if(!plan)return;
 const built=makeSourcePlan(plan);
 schedule=built.slots;sourcesTotal=built.books;segmentsTotal=built.segments;
+state.theoryPlanWarnings=built.warnings;
 for(const [date,ref] of schedule){
  const fresh=stableReading(ref),old=state.missions[fresh.id]||{};
+ const changed=old.reading_schedule_version && old.reading_schedule_version!==fresh.reading_schedule_version
+ && (old.source!==fresh.source || old.title!==fresh.title);
+ if(changed&&(old.validated||old.evidence||old.correction||old.submitted_at)){
+  const archivedId='LEITHIST-'+date.replace(/-/g,'');
+  if(!state.missions[archivedId])state.missions[archivedId]={...old,id:archivedId,
+    title:(old.title||'Leitura anterior')+' [histórico preservado]',
+    theory_archived:true,legacy:true};
+ }
+ const preserve=!(changed&&(old.validated||old.evidence||old.correction||old.submitted_at));
  const keys=['validated','status','evidence','evidence_link','actual_minutes','correction','correction_ref','learning_stage','is_full_piece','used_model','submitted_at','validated_date','gross_seconds','pause_seconds','effective_seconds','saved_at'];
- const merged={...fresh};for(const k of keys)if(old[k]!==undefined&&old[k]!==null)merged[k]=old[k];
- if(old.validated===true&&Number.isFinite(Number(old.xp_base)))merged.xp_base=Number(old.xp_base);
+ const merged={...fresh};
+ if(preserve)for(const k of keys)if(old[k]!==undefined&&old[k]!==null)merged[k]=old[k];
+ if(preserve&&old.validated===true&&Number.isFinite(Number(old.xp_base)))merged.xp_base=Number(old.xp_base);
  state.missions[fresh.id]=merged;
 }
-state.theoryPlanVersion='1.0';
+state.theoryPlanVersion='2.0-pedagogica';
 save();
 }
+function refLabel(ref){return ref.sources.map(x=>x.file+', pp. '+x.first+'–'+x.last).join('; ')}
 function thHtml(ref){
-return '<div class="theory-banner"><div class="eyebrow">BLOCO EXTRA DE TEORIA · +45 MIN</div><p><strong>'+errSafe(ref.reinforcement?'Releitura ativa':'Estudar '+ref.kind)+': '+topic(ref.file)+'</strong><br>'+errSafe(ref.file)+' · páginas '+ref.first+'–'+ref.last+'</p><p>30 minutos para compreender o material, com pré-leitura e síntese final. O objetivo é aprender a teoria antes de apenas resolver questões. O tempo é uma estimativa; se precisar, divida a leitura.</p><button class="btn primary small-btn" data-open-mission="'+PREFIX+ref.date.replace(/-/g,'')+'">Abrir roteiro de leitura</button></div>';
+const id=PREFIX+ref.date.replace(/-/g,'');
+return '<div class="theory-banner"><div class="eyebrow">1. TEORIA E PRÉ-REQUISITOS • +45 MIN</div><p><strong>'+errSafe(ref.title)+'</strong><br>'+errSafe(refLabel(ref))+'</p>'
++'<p><b>Sequência:</b> '+errSafe(ref.path)+'<br><b>Quando fazer:</b> '+errSafe(ref.timing)+'</p>'
++'<button class="btn primary small-btn" data-open-mission="'+id+'">Abrir leitura guiada (passo a passo)</button></div>';
 }
 function sourceCounts(){
-if(!plan)return{books:0,slides:0};const files=new Set([...schedule.values()].map(x=>x.file));
-return{books:[...files].filter(f=>f.startsWith('E-book')).length,slides:[...files].filter(f=>f.startsWith('Slides')).length};
+if(!plan)return {books:0,slides:0};
+const files=new Set([...schedule.values()].flatMap(x=>x.sources.map(y=>y.file)));
+return {books:[...files].filter(f=>f.startsWith('E-book')).length,
+slides:[...files].filter(f=>f.startsWith('Slides')).length};
 }
 function renderTab(){
 if(!plan||!schedule)return;
-const count=sourceCounts();const done=[...schedule.keys()].filter(date=>state.missions[PREFIX+date.replace(/-/g,'')]?.validated===true).length;
-$('theoryOverview').innerHTML='<div class="theory-metrics"><div class="theory-metric"><small>E-BOOKS MENCIONADOS NO PLANO</small><strong>'+count.books+'</strong><small>Não equivale ao acervo total</small></div><div class="theory-metric"><small>CONJUNTOS DE SLIDES REFERENCIADOS</small><strong>'+count.slides+'</strong><small>Faixas de páginas citadas</small></div><div class="theory-metric"><small>BLOCOS DE LEITURA</small><strong>'+done+' / '+schedule.size+'</strong><small>45 min cada; evidência e validação</small></div><div class="theory-metric"><small>CARGA TOTAL PROPOSTA</small><strong>397h45</strong><small>334h base + 63h45 teoria</small></div></div><div class="theory-intro"><strong>Importante:</strong><p class="theory-note">Esta trilha trata das <b>faixas de páginas citadas</b> na versão 1.2. Não é inventário concluído, nem afirma que todos os arquivos e páginas enviados foram estudados. Após “finalizei os envios”, auditar o acervo completo para cobrir o que faltar. Se o dia estiver pesado, remanejar a leitura sem empilhar tarefas.</p></div>';
+const count=sourceCounts(),done=[...schedule.keys()].filter(d=>state.missions[PREFIX+d.replace(/-/g,'')]?.validated).length;
+const weekdayCount=schedule.size,minutes=weekdayCount*MINUTES,base=plan.targets?.planned_hours||334;
+const formatted=(n)=>Math.floor(n/60)+'h'+(n%60?String(n%60).padStart(2,'0'):'');
+$('theoryOverview').innerHTML='<div class="theory-metrics"><div class="theory-metric"><small>E-BOOKS NO ROTEIRO CURADO</small><strong>'+count.books+'</strong><small>Faixas efetivamente indicadas</small></div><div class="theory-metric"><small>CONJUNTOS DE SLIDES</small><strong>'+count.slides+'</strong><small>Sem confundir trecho com PDF completo</small></div><div class="theory-metric"><small>LEITURAS DOCUMENTADAS</small><strong>'+done+' / '+weekdayCount+'</strong><small>45 min; só conta com correção</small></div><div class="theory-metric"><small>CARGA COM A TRILHA</small><strong>'+formatted(base*60+minutes)+'</strong><small>'+base+'h base + '+formatted(minutes)+' teoria</small></div></div>'
++'<div class="theory-intro"><strong>Ordem pedagógica, não lista aleatória de PDFs.</strong><p class="theory-note">As leituras seguem 17 etapas: reconhecimento processual → peças-base → recursos → teses penais → modalidades especiais → consolidação. O roteiro original de peças e discursivas continua. Cada sessão indica pré-requisito, motivo, PDF, páginas e produção escrita. O bloco teórico deve anteceder os exercícios relacionados, exceto no diagnóstico inicial, que precisa ser espontâneo.</p><p class="theory-note">A revisão integral do acervo aguarda “finalizei os envios”. Páginas citadas são as do plano recebido; arquivos não hospedados precisam ser selecionados no computador. Caso falte tempo, registre o realizado e replaneje, sem fingir leitura concluída.</p></div>';
 $('theorySchedule').innerHTML=[...schedule.values()].map(ref=>{
  const m=state.missions[PREFIX+ref.date.replace(/-/g,'')];
- return '<div class="theory-row"><b>'+format(ref.date)+'</b><div><strong>'+errSafe(topic(ref.file))+'</strong><div class="theory-file">'+errSafe(ref.file)+'</div><div class="muted">p. '+ref.first+'–'+ref.last+' · '+MINUTES+' min · '+(ref.reinforcement?'Recuperação ativa':ref.scheduledAhead?'Estudo antecipado':'Leitura estruturada')+'</div><button class="btn small-btn" style="margin-top:7px" data-open-mission="'+errSafe(m.id)+'">Abrir leitura</button></div>'+statusBadge(m)+'</div>';
+ return '<div class="theory-row"><b>'+format(ref.date)+'</b><div><strong>'+errSafe(ref.title)+'</strong>'
+ +'<div class="theory-file">'+errSafe(refLabel(ref))+'</div><div class="muted">45 min • '+errSafe(ref.path)+'</div><div class="muted"><b>Ordem:</b> '+errSafe(ref.timing)+'</div>'
+ +'<button class="btn small-btn" style="margin-top:7px" data-open-mission="'+errSafe(m.id)+'">Abrir etapas</button></div>'+statusBadge(m)+'</div>';
 }).join('');
 }
 const mainRender=render;
 render=function(){
-if(plan&&(!schedule||!state.theoryPlanVersion))syncReadings();
+if(plan&&(!schedule||state.theoryPlanVersion!=='2.0-pedagogica'))syncReadings();
 mainRender();
 if(!plan||!schedule)return;
 setText('statMissions',numValid()+' / '+(plan.missions.length+schedule.size));
@@ -130,18 +152,24 @@ renderDaily=function(){
 dailyBase();
 if(!schedule)return;
 const ref=schedule.get(selectedDate);if(!ref)return;
-const container=$('dailyMissions');
-const id=PREFIX+selectedDate.replace(/-/g,'');
-if(!container.innerHTML.includes(id))container.innerHTML+=thHtml(ref);
+const container=$('dailyMissions');let html=container.innerHTML;
+const block=thHtml(ref);
+const first=html.indexOf('<div class="item"');
+const second=first===-1?-1:html.indexOf('<div class="item"',first+5);
+if(selectedDate==='2026-10-26'){
+ // Em diagnóstico, NUNCA antecipar a teoria: primeiro o aluno tenta A–F.
+ html=second>=0?html.slice(0,second)+block+html.slice(second):html+block;
+}else html=first>=0?html.slice(0,first)+block+html.slice(first):html+block;
 const baseMinutes=Math.round((getDay(selectedDate)?.planned_hours||0)*60);
-container.innerHTML=container.innerHTML.replace(baseMinutes+' minutos previstos',baseMinutes+' min do roteiro + 45 min de teoria = '+(baseMinutes+45)+' min planejados');
-const heading=$('dayHeading');if(heading)heading.textContent+=' · +45 min estudo teórico (bloco complementar)';
+html=html.replace(baseMinutes+' minutos previstos',baseMinutes+' min do roteiro + 45 min de teoria = '+(baseMinutes+45)+' min planejados');
+container.innerHTML=html;
+const heading=$('dayHeading');if(heading)heading.textContent+=' · ordem pedagógica '+(selectedDate==='2026-10-26'?'diagnóstico → teoria → prática':'teoria → prática')+' · +45 min';
 };
 const calendarBase=renderCalendar;
 renderCalendar=function(){
-calendarBase();
-if(!schedule)return;
-const r=schedule.get(selectedDate);
-if(r){$('calDayDetails').innerHTML+='<div class="theory-banner"><b>Leitura adicional: +45 min</b><p>'+errSafe(topic(r.file))+' — p. '+r.first+'–'+r.last+'</p></div>';}
+calendarBase();if(!schedule)return;const ref=schedule.get(selectedDate);if(!ref)return;
+$('calDayDetails').innerHTML+='<div class="theory-banner"><b>Etapa teórica adicional: 45 min</b>'
++'<p>'+errSafe(ref.title)+'<br>'+errSafe(refLabel(ref))+'</p>'
++'<p>Ordem: '+errSafe(ref.timing)+'</p></div>';
 };
 })();

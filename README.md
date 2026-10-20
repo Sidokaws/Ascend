@@ -85,24 +85,9 @@ Cada situação contém campos independentes para último ato/fase, peça/medida
 **Importante:** salvar a tentativa no painel não a envia automaticamente ao ChatGPT e não concede XP até registro de correção. Os arquivos `ascend-dia1.js` e `ascend-dia1.css` adicionam a experiência sem alterar o plano JSON original V1.2.
 
 
-## Trilha complementar de teoria — outubro de 2026 (provisória)
+## Registro da V1.0 (descontinuada)
 
-**Motivo:** a V1.2 reserva 334h e mistura, em diversas tarefas, leitura breve e resposta de questão no mesmo tempo. Em geral, essa distribuição não garante compreensão suficientemente profunda de e-books extensos.
-
-Auditoria da base V1.2: 44 e-books e 7 conjuntos de slides aparecem nominalmente nas fontes dos passos, somando 51 arquivos distintos (não representa inventário de todos os PDFs enviados). Foram identificados 78 blocos únicos de até dez páginas citadas, após união de intervalos sobrepostos.
-
-A interface ganhou uma aba **Teoria: e-books e slides**, com:
-- 85 sessões adicionais de 45 minutos (dias úteis de segunda a sexta), IDs \`LEIT-YYYYMMDD\` sem substituir as 274 missões originais;
-- leitura dos trechos explicitamente referenciados, anotações, localização de artigos no Vade e uma aplicação TBFP;
-- sete janelas de revisitação/recuperação ativa, quando não há novo trecho programado;
-- fontes/páginas exatas do plano original (não inventar o restante dos PDFs);
-- produção com evidência, correção e XP somente após validação.
-
-**Nova previsão:** 334h roteiro-base + 63h45 leitura aprofundada = **397h45**, se as 85 sessões complementares forem feitas. Isso não altera a carga original das peças, discursivas e simulados. Horário é estimativa, não meta rígida; tarefas podem ser redistribuídas diante de fadiga ou de leitura extensa.
-
-**Importante:** ler as *páginas citadas* não equivale a ler integralmente 51 PDFs; a auditoria definitiva de todo o material ainda aguarda a mensagem "finalizei os envios". Nesse momento deveremos catalogar páginas efetivas, complementar lacunas e ajustar volume real de teoria, e não alegar que o acervo inteiro já foi coberto.
-
-Arquivos implementados: \`ascend-teoria.js\`, \`ascend-teoria.css\`. A migração preserva dados existentes por ID estável e não hospeda os PDFs.
+A versão anterior distribuía automaticamente leituras a partir da primeira referência de cada PDF. **Não deve mais ser usada como sequência pedagógica**, pois podia atrasar conteúdos essenciais. Foi substituída pela curadoria V2.0 documentada a seguir.
 
 ## Sequência pedagógica auditada — versão 2.0 (19/10/2026)
 
@@ -150,3 +135,5 @@ Calendário oficial da OAB, consultado em 19/10/2026: prova prático-profissiona
 
 Foram validados contra o JSON V1.2: **119 dias**, **274 missões-base**, **85 blocos extras (5 por semana)**, **51 arquivos de leitura distintos**, **nenhuma referência de páginas faltante no roteiro curado**, **15 janelas de simulado de revisão**; todos os contadores de execução começam sem evidências presumidas. Fluxo de cópias de progresso testado para não reclassificar aulas anteriores.
 
+
+Roteiro auditável para baixar/conferir: [85 leituras com arquivo, páginas, pré-requisito, ordem e tempo](data/trilha-teorica-pedagogica-v2.csv).

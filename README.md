@@ -83,3 +83,23 @@ A primeira missão, `ASC-20261026-01`, apresenta agora o próprio **Caderno de D
 Cada situação contém campos independentes para último ato/fase, peça/medida, fundamento opcional, confiança 0/1/2 e dúvida. É legítimo escrever **“não sei”**. Um exemplo neutro mostra como preencher, sem responder às seis situações. As tentativas são **rascunhos salvos no navegador** (`state.diagnosticoDia1Draft`), incluídos no backup V3; o usuário pode copiar seu texto para a conversa com o mentor.
 
 **Importante:** salvar a tentativa no painel não a envia automaticamente ao ChatGPT e não concede XP até registro de correção. Os arquivos `ascend-dia1.js` e `ascend-dia1.css` adicionam a experiência sem alterar o plano JSON original V1.2.
+
+
+## Trilha complementar de teoria — outubro de 2026 (provisória)
+
+**Motivo:** a V1.2 reserva 334h e mistura, em diversas tarefas, leitura breve e resposta de questão no mesmo tempo. Em geral, essa distribuição não garante compreensão suficientemente profunda de e-books extensos.
+
+Auditoria da base V1.2: 44 e-books e 7 conjuntos de slides aparecem nominalmente nas fontes dos passos, somando 51 arquivos distintos (não representa inventário de todos os PDFs enviados). Foram identificados 78 blocos únicos de até dez páginas citadas, após união de intervalos sobrepostos.
+
+A interface ganhou uma aba **Teoria: e-books e slides**, com:
+- 85 sessões adicionais de 45 minutos (dias úteis de segunda a sexta), IDs \`LEIT-YYYYMMDD\` sem substituir as 274 missões originais;
+- leitura dos trechos explicitamente referenciados, anotações, localização de artigos no Vade e uma aplicação TBFP;
+- sete janelas de revisitação/recuperação ativa, quando não há novo trecho programado;
+- fontes/páginas exatas do plano original (não inventar o restante dos PDFs);
+- produção com evidência, correção e XP somente após validação.
+
+**Nova previsão:** 334h roteiro-base + 63h45 leitura aprofundada = **397h45**, se as 85 sessões complementares forem feitas. Isso não altera a carga original das peças, discursivas e simulados. Horário é estimativa, não meta rígida; tarefas podem ser redistribuídas diante de fadiga ou de leitura extensa.
+
+**Importante:** ler as *páginas citadas* não equivale a ler integralmente 51 PDFs; a auditoria definitiva de todo o material ainda aguarda a mensagem "finalizei os envios". Nesse momento deveremos catalogar páginas efetivas, complementar lacunas e ajustar volume real de teoria, e não alegar que o acervo inteiro já foi coberto.
+
+Arquivos implementados: \`ascend-teoria.js\`, \`ascend-teoria.css\`. A migração preserva dados existentes por ID estável e não hospeda os PDFs.

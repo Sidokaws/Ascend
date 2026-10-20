@@ -69,7 +69,7 @@ return ids.size+4*simCount(s);
 function totalXp(){return missions().filter(m=>m.validated===true).reduce((sum,m)=>sum+number(m.xp_base||40),0)}
 function levelInfo(){let level=1,left=totalXp();while(left>=500+(level-1)*125&&level<200){left-=500+(level-1)*125;level++}return {level,current:left,needed:500+(level-1)*125}}
 function rankFor(n){return n>=40?'S':n>=30?'A':n>=22?'B':n>=15?'C':n>=8?'D':'E'}
-function statusBadge(m){const a=m.validated===true;const b=m.status==='Enviado para revisão'||m.status==='Ajustar';return '<span class="tag '+(a?'green':m.status==='Ajustar'?'red':b?'amber':'blue')+'">'+(a?'✓ Validada':m.status==='Ajustar'?'↻ Refazer':b?'Aguardando correção':'Pendente')+'</span>'}
+function statusBadge(m){const a=m.validated===true;const b=m.status==='Enviado para revisão'||m.status==='Ajustar'||m.status==='Tentativa salva no painel';return '<span class="tag '+(a?'green':m.status==='Ajustar'?'red':b?'amber':'blue')+'">'+(a?'✓ Validada':m.status==='Ajustar'?'↻ Refazer':m.status==='Tentativa salva no painel'?'Tentativa salva · enviar ao mentor':b?'Aguardando correção':'Pendente')+'</span>'}
 function notify(t){const el=$('snackbar');el.textContent=t;el.classList.remove('hidden');clearTimeout(notify.t);notify.t=setTimeout(()=>el.classList.add('hidden'),3800)}
 function setText(id,v){const el=$(id);if(el)el.textContent=v}
 function setTab(tab){
@@ -153,8 +153,8 @@ openDialog('gradeDialog');
 function recordMission(e){
 e.preventDefault();const f=e.target,id=f.elements.id.value,m=state.missions[id];if(!m||m.validated)return;
 const ev=f.elements.evidence.value.trim();if(ev.length<10){notify('Descreva evidência real com pelo menos 10 caracteres.');return}
-m.evidence=ev;m.evidence_link=f.elements.evidence_link.value.trim();m.actual_minutes=f.elements.actual_minutes.value?Number(f.elements.actual_minutes.value):null;m.learning_stage=f.elements.learning_stage.value;m.status='Enviado para revisão';m.validated=false;m.submitted_at=new Date().toISOString();
-save();$('missionDialog').close();render();notify('Produção enviada. Aguarda correção/verificação para XP.');
+m.evidence=ev;m.evidence_link=f.elements.evidence_link.value.trim();m.actual_minutes=f.elements.actual_minutes.value?Number(f.elements.actual_minutes.value):null;m.learning_stage=f.elements.learning_stage.value;m.status=m.type==='diagnostico'?'Tentativa salva no painel':'Enviado para revisão';m.validated=false;if(m.type==='diagnostico')m.saved_at=new Date().toISOString();else m.submitted_at=new Date().toISOString();
+save();$('missionDialog').close();render();notify(m.type==='diagnostico'?'Tentativa salva no painel. Copie para a conversa e envie ao mentor.':'Produção registrada. Aguarda correção/verificação para XP.');
 }
 function validateMission(e){
 e.preventDefault();const f=e.target,m=state.missions[f.elements.id.value];if(!m||!m.evidence)return;

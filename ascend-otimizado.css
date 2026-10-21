@@ -1,0 +1,7 @@
+
+/* ASCEND V2.1 — one authoritative daily budget; old add-on cards hidden. */
+#dailyMissions>.theory-banner,.page #calDayDetails>.theory-banner{display:none}
+#optimizedDayBudget .notice{background:linear-gradient(115deg,#122c48,#231c43);border:1px solid #595c99;border-left:3px solid #71c8ff;border-radius:9px;padding:15px;margin:14px 0;font-size:13px}
+#optimizedDayBudget .notice b{color:#c7eaff;font-size:15px}
+#optimizedDayBudget .notice p{line-height:1.65;font-size:12px;color:#cbdcee}
+#optimizedDayBudget small{font-size:11px;color:#a9c5df;line-height:1.7}

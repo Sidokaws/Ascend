@@ -1,5 +1,14 @@
 # SYSTEM // ASCEND — OAB 48 · V3 + roteiro executável V1.2
 
+## PLANO VIGENTE: V2.1 SUSTENTÁVEL (21/10/2026)
+
+**Este é o orçamento de tempo que prevalece sobre referências antigas abaixo:** **335 horas nas 17 semanas**, média de **3h17 por dia ativo**. Aulas de e-books, slides e modelos são **integradas** às 334 horas-base, sem 63h45 adicionais. Mantemos 34 retestes de 15 minutos e corrigimos **10 simulados de 5 horas**, com 45 minutos de triagem na segunda seguinte; cinco domingos antes reservados a simulado viram 2 horas de revisão. Sábados livres, Revisão Turbo (22–27/02) separada.
+
+**Metas condicionais:** 30 oficinas + 10 provas = 40 produções de peça; 85 discursivas avulsas + 40 nos simulados = 125 discursivas. Nada é contabilizado sem produção e correção. As 85 referências curadas permanecem para consulta dentro do bloco-base, não como 85 sessões adicionais. Esse planejamento não autoriza declarar lidos os PDFs completos. Os 15 pacotes originais ficam preservados para eventual decisão pedagógica posterior, mas somente 10 integram o cronograma obrigatório atual.
+
+[Auditoria técnica de conteúdo e horas — CEISC 40 dias versus ASCEND 119 dias](docs/auditoria-resumo-v2.1.md).
+
+
 Aplicativo de treinamento gamificado da 2ª fase da OAB em Direito Penal, com tela de despertar, níveis, missões, matriz de peças, discursivas, simulados e revisões.
 
 ## Acesso
@@ -144,7 +153,7 @@ Roteiro auditável para baixar/conferir: [85 leituras com arquivo, páginas, pr�
 - **Peças históricas da FGV:** uma peça de prova antiga ainda não tentada pelo estudante é *primeiro contato* para ele, independentemente de já ter caído. O app permite registrar separadamente primeiro contato/revisão dos 27 casos de treino; não assume origem oficial não verificada.
 - **Correção existente:** 34 sessões de 45 min (= 25h30), preservadas do arquivo v1.2.
 - **Novos blocos**: 34 × 15 min de reescrita dirigida (= 8h30) e 14 × 60 min de triagem pós-simulado, no dia seguinte e somente após realmente produzir (= 14h). Total suplementar condicional 22h30.
-- **Carga potencial:** 334h originais + 63h45 teoria + 22h30 correção = **420h15**. Em sobrecarga, replanejar sem empilhar. A última janela SIM-15 (21/02) deve ser **preferencialmente revisão pré-Turbo**, sem correção postergada aos dias 22–27/02.
+- **Carga vigente: 335h**, incluindo retestes e dez provas completas; teoria integrada no tempo-base.
 - **Qualidade do espelho:** diferenciar FGV oficial de padrão CEISC e espelho pedagógico autoral, sem falsificar nota ou natureza do documento.
 - **Dados:** registros suplementares e exposição a casos ficam no navegador; não há XP sem produção avaliada.
 

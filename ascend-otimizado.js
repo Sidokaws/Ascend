@@ -40,11 +40,19 @@ const label=b.kind==='simulado'?'5h de prova, condicionada à prontidão':b.kind
 $('optimizedDayBudget').innerHTML='<div class="notice"><b>PLANO OTIMIZADO V2.1 — '+hrs(b.minutes)+'</b><p>'+safe(label)+'. A leitura dos slides/e-books faz parte dos 180min-base: não somar outros 45min por fora.</p>'
 +'<small>119 dias · 335h · 10 simulados de 5h · 7 domingos de revisão · sábados livres · 30 peças avulsas + 10 em simulados · 85 discursivas + 40 em simulados (metas condicionais).</small></div>';
 setText('dayHeading',getDay(selectedDate).day_id+' · semana '+b.week+' · carga revisada: '+hrs(b.minutes));
+const weekday=getDay(selectedDate).weekday;
+if(['segunda-feira','quarta-feira'].includes(weekday)){
+ const next=plan.days.find(d=>d.date===new Date(new Date(selectedDate+'T12:00:00').getTime()+86400000).toISOString().slice(0,10));
+ const preview=next&&state.missions['LEIT-'+next.date.replace(/-/g,'')];
+ if(preview)$('optimizedDayBudget').innerHTML+='<p class="balanced-caption"><b>Preparação para a peça do dia seguinte:</b> utilize parte do bloco teórico de hoje para compreender '+safe(preview.title)+'. Referência: '+safe(preview.source||'Vade Mecum')+'. Não é tempo adicional.</p>';
+}
+if(['terça-feira','quinta-feira'].includes(weekday))$('optimizedDayBudget').innerHTML+='<p class="balanced-caption">Hoje a teoria serve à peça: recupere o que foi estudado ontem e consulte o Vade/modelo dentro da oficina. Se a base estiver insuficiente, priorize compreensão e registre a dificuldade, sem inventar conclusão.</p>';
 if(b.kind==='revisao'&&b.week>2){
 const id='REV-DOM-'+selectedDate.replace(/-/g,'');
 $('dailyMissions').innerHTML='<div class="item"><span class="tag blue">REVISÃO SUBSTITUI SIMULADO</span><h3>Corrigir, reescrever e retestar — 2h</h3><p class="item-meta">30min estrutura; 40min pior tese/pedidos; 30min discursiva; 20min Vade e banco de erros.</p><button class="btn primary" data-open-mission="'+id+'">Abrir revisão escrita</button></div>';
 }
 if(b.kind==='descanso')$('dailyMissions').innerHTML='<div class="notice">Descanso programado. Nenhuma atividade pendente será transferida automaticamente.</div>';
+$('dailyMissions').innerHTML=$('dailyMissions').innerHTML.replace(/180 min do roteiro \+ 45 min de teoria = 225 min planejados/g,'180min totais de prática e teoria integrada');
 const theory=$('theoryOverview');if(theory)theory.innerHTML='<div class="notice"><b>85 referências teóricas CURADAS, dentro das horas-base.</b> Não são 85 sessões extras: e-books, slides e modelos entram no bloco de teoria/cobertura ou na consulta da oficina. A carga total revisada é <b>335h</b>, não 420h15. Registre páginas efetivamente lidas, sem concluir PDFs por presunção.</div>';
 const oldSchedule=$('theorySchedule');if(oldSchedule)oldSchedule.innerHTML=oldSchedule.innerHTML.replace(/45 min •/g,'Referência integrada •');
 const sims=$('simList');

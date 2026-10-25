@@ -147,6 +147,15 @@ $('adendoAuditStats').textContent='Semana '+week+': '+done+'/'+missions.length+'
 document.addEventListener('click',e=>{if(e.target.id!=='adendoAuditSave')return;const week=$('adendoWeek')?.value,notes=$('adendoAuditText')?.value?.trim();if(!week||!notes||notes.length<20){notify('Descreva o que foi de fato conferido e as pendências desta semana.');return}st().audits[week]={notes,date:today()};save();render();notify('Auditoria semanal registrada; nenhuma missão marcada como concluída.')});
 }
 const previousRender=render;
-render=function(){previousRender();if(!plan)return;st();renderQuality();renderSim()};
+render=function(){
+previousRender();if(!plan)return;st();renderQuality();renderSim();
+const active=(state.grades||[]).filter(g=>g.type==='Simulado'&&g.confirmed===true&&g.complete===true&&g.is_full_piece===true&&officialSim(plan.simulations.find(x=>x.id===(g.simId||g.topic))||{week:0}));
+const activeCount=new Set(active.map(g=>g.simId||g.topic)).size;
+const baseValidated=plan.missions.filter(m=>state.missions[m.id]?.validated===true).length;
+setText('statMissions',baseValidated+' / '+plan.missions.length);
+setText('statPieces',pieceCount()+' / 40');
+setText('statQuestions',(Math.max(0,questionCount()-4*simCount())+4*activeCount)+' / 125');
+setText('statSims',activeCount+' / 10');
+};
 document.addEventListener('DOMContentLoaded',bind);
 })();

@@ -4,7 +4,7 @@
 const ACTIVE_WEEKS=new Set([3,5,7,8,10,11,12,14,15,16]);
 const ESPECIALIDADES=['Apelação','Memoriais','Resposta à Acusação','RESE','Agravo em Execução','Contrarrazões'];
 const formatPoints=n=>Number(n||0).toFixed(2).replace('.',',');
-function st(){if(!state.adendo2510||typeof state.adendo2510!=='object')state.adendo2510={};const a=state.adendo2510;a.discursive=a.discursive||{};a.exposure=a.exposure||{};a.audits=a.audits||{};return a}
+function st(){if(!state.adendo2510||typeof state.adendo2510!=='object')state.adendo2510={};const a=state.adendo2510;a.discursive=a.discursive||{};a.exposure=a.exposure||{};a.audits=a.audits||{};a.writingStages=a.writingStages||{};return a}
 function actionCount(type){return plan?.missions?.filter(m=>m.type===type).length||0}
 function officialSim(s){return ACTIVE_WEEKS.has(Number(s.week))}
 function sampleStatus(id){return st().exposure[id]||'pendente'}
@@ -61,7 +61,9 @@ const piece=['peca_completa','treino_guiado_peca','oficina_peca'].includes(m.typ
 if(piece){
 const map={reconhecimento:'Contato teórico',guiado:'Oficina guiada',integral_consulta:'Peça integral com apoio',autonomo:'Peça integral autônoma'};
 el.innerHTML='<div class="adendo-box"><b>Quatro etapas de escrita</b><p class="muted small">1. Contato teórico → 2. Esqueleto → 3. Oficina guiada → 4. Peça integral autônoma. A etapa registrada é "'+htmlEscape(map[m.learning_stage]||'não avaliada')+'".</p>'
-+'<p class="muted small">Para contar como peça integral: texto do início ao fim, tentativa própria sem modelo pronto, correção e registro expresso de autonomia. Uso do Vade permitido não equivale a copiar modelo.</p></div>';
++'<p class="muted small">Para contar como peça integral: texto do início ao fim, tentativa própria sem modelo pronto, correção e registro expresso de autonomia. Uso do Vade permitido não equivale a copiar modelo.</p>'
++'<label>Etapa da produção (registro pedagógico, não validação automática)</label><select data-adendo-stage="'+htmlEscape(id)+'">'
++[['contato','Contato teórico'],['esqueleto','Esqueleto escrito'],['guiada','Oficina guiada'],['integral','Peça integral autônoma (só após correção)']].map(([value,label])=>'<option value="'+value+'" '+((st().writingStages[id]||'contato')===value?'selected':'')+'>'+label+'</option>').join('')+'</select></div>';
 }
 if(m.type==='discursiva'&&m.evidence&&!m.validated){
 const prior=st().discursive[id]||{};
@@ -83,7 +85,7 @@ el.innerHTML='<div class="adendo-box"><b>Correção A/B</b>'
 }else el.innerHTML='';
 }
 const previousOpenGrade=openGrade;
-openGrade=function(type,topic=''){previousOpenGrade(type,topic);renderGrade()};
+openGrade=function(type,topic=''){previousOpenGrade(type,topic);if(type==='Discursiva')$('gradeForm').elements.max.value='1.25';renderGrade()};
 const previousOpenMission=openMission;
 openMission=function(id){previousOpenMission(id);renderMission()};
 const previousRecordGrade=recordGrade;
@@ -130,7 +132,18 @@ e.preventDefault();notify('Uma peça só conta como integral autônoma depois de
 previousValidate(e);
 };
 function bind(){
-document.addEventListener('change',e=>{const field=e.target.closest('[data-adendo-exposure]');if(!field)return;st().exposure[field.dataset.adendoExposure]=field.value;save();render()});
+document.addEventListener('change',e=>{
+const field=e.target.closest('[data-adendo-exposure]');
+if(field){st().exposure[field.dataset.adendoExposure]=field.value;save();render();return}
+const stage=e.target.closest('[data-adendo-stage]');
+if(stage){st().writingStages[stage.dataset.adendoStage]=stage.value;save();notify('Etapa declarada e salva. Domínio depende de produção e correção.');return}
+const weekly=e.target.closest('#adendoWeek');if(weekly){
+const week=Number(weekly.value),saved=st().audits[week],missions=plan.missions.filter(m=>Number(m.week)===week);
+$('adendoAuditText').value=saved?.notes||'';
+const done=missions.filter(m=>state.missions[m.id]?.validated===true).length;
+$('adendoAuditStats').textContent='Semana '+week+': '+done+'/'+missions.length+' missões-base validadas. Registre também cobertura, TBFP, Vade, revisões e ineditismo.';
+}
+});
 document.addEventListener('click',e=>{if(e.target.id!=='adendoAuditSave')return;const week=$('adendoWeek')?.value,notes=$('adendoAuditText')?.value?.trim();if(!week||!notes||notes.length<20){notify('Descreva o que foi de fato conferido e as pendências desta semana.');return}st().audits[week]={notes,date:today()};save();render();notify('Auditoria semanal registrada; nenhuma missão marcada como concluída.')});
 }
 const previousRender=render;

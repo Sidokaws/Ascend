@@ -80,8 +80,19 @@ function canLog(s){
  return !!m?.evidence;
 }
 function status(s){
- const done=completed(s),readiness=canLog(s);
- return '<span class="tag '+(done?'green':readiness?'blue':'amber')+'">'+(done?'✓ Revisado':readiness?'Programado':'Após envio')+'</span>';
+ const done=completed(s),ready=canLog(s);
+ return '<span class="tag '+(done?'green':ready?'blue':'amber')+'">'+(done?'✓ Reteste registrado':ready?'Correção registrada — pronto para reteste':s.type==='reforco_peca'?'Aguardando produção e correção':'Aguardando simulado')+'</span>';
+}
+function stepsHTML(s){
+ if(!s.steps)return '<p class="item-meta">'+qesc(s.instruction)+'</p>';
+ return '<p class="item-meta"><b>Quando:</b> somente depois da produção e da correção de 45 minutos da peça '+qesc(s.caseId)+' deste mesmo dia.</p>'
+ +'<ol class="quality-steps">'+s.steps.map(x=>'<li>'+qesc(x)+'</li>').join('')+'</ol>'
+ +'<p class="item-meta"><b>O que entregar:</b> '+qesc(s.deliverable)+'</p>';
+}
+function budgetLabel(s){return s.type==='reforco_peca'?'15 minutos JÁ INCLUÍDOS nas 3h15 do dia (não somar de novo)':'45 minutos JÁ INCLUÍDOS na segunda após simulado';}
+function retestButton(s){
+ return '<button class="btn small-btn" data-quality-log="'+qesc(s.id)+'" '+(canLog(s)?'':'disabled aria-disabled="true"')+'>'
+ +(canLog(s)?'Registrar reescrita concluída':s.type==='reforco_peca'?'Aguardar correção desta peça':'Aguardar realização do simulado')+'</button>';
 }
 function qualityContext(){
  const done=qualitySchedule.filter(completed);
@@ -97,22 +108,24 @@ function qualityContext(){
 }
 function qualityList(){
  const completedCount=qualitySchedule.filter(completed).length;
- $('qualitySlots').innerHTML='<p class="muted small">Registros validados: '+completedCount+' / '+qualitySchedule.length+'. Um reteste é contado só com referência da correção e evidência da reescrita.</p><div class="quality-scroll">'
- +qualitySchedule.map(s=>'<div class="item"><div class="section-head"><b class="small">'+format(s.date)+' · '+qesc(s.title)+'</b>'+status(s)+'</div><p class="item-meta">'+s.mins+' min adicionais. '+qesc(s.instruction)+'</p>'
- +(completed(s)?'<p class="item-meta">Evidência: '+qesc(state.qualityRecords[s.id].evidence)+'</p>':'<button class="btn small-btn" data-quality-log="'+qesc(s.id)+'">'+(canLog(s)?'Registrar reteste corrigido':'Aguardar produção do simulado')+'</button>')+'</div>').join('')+'</div>';
+ $('qualitySlots').innerHTML='<p class="muted small">Retestes documentados: '+completedCount+' / '+qualitySchedule.length+'. Nenhum exercício é validado sem produção e correção.</p><div class="quality-scroll">'
+ +qualitySchedule.map(s=>'<div class="item"><div class="section-head"><b class="small">'+format(s.date)+' · '+qesc(s.title)+'</b>'+status(s)+'</div>'
+ +stepsHTML(s)+'<p class="item-meta"><b>'+qesc(budgetLabel(s))+'</b></p>'
+ +(completed(s)?'<p class="item-meta">Produção refeita: '+qesc(state.qualityRecords[s.id].evidence)+'</p>':retestButton(s))+'</div>').join('')+'</div>';
 }
 function daySection(){
  if(!qualitySchedule)return;
  const todays=qualitySchedule.filter(s=>s.date===selectedDate);
  if(!todays.length)return;
  const container=$('dailyMissions');
- container.innerHTML+='<div class="quality-day"><div class="eyebrow">FIXAÇÃO APÓS FEEDBACK</div><h3 class="heading">Correção e reescrita programadas</h3>'
- +todays.map(s=>'<div class="item"><div class="section-head"><b>'+qesc(s.title)+'</b>'+status(s)+'</div><p class="item-meta">'+qesc(s.instruction)+'</p><p class="item-meta"><b>'+s.mins+' minutos adicionais</b> — só executar depois da produção/correção aplicável.</p>'
- +(!completed(s)?'<button class="btn small-btn" data-quality-log="'+qesc(s.id)+'">'+(canLog(s)?'Registrar após correção':'Pendente de simulado')+'</button>':'<span class="tag green">Reteste documentado</span>')+'</div>').join('')+'</div>';
+ container.innerHTML+='<div class="quality-day"><div class="eyebrow">FIXAÇÃO APÓS FEEDBACK</div><h3 class="heading">Reteste da peça que você acabou de corrigir</h3>'
+ +todays.map(s=>'<div class="item"><div class="section-head"><b>'+qesc(s.title)+'</b>'+status(s)+'</div>'
+ +stepsHTML(s)+'<p class="item-meta"><b>'+qesc(budgetLabel(s))+'</b></p>'
+ +(completed(s)?'<span class="tag green">Produção refeita e registrada</span>':retestButton(s))+'</div>').join('')+'</div>';
 }
 function log(id){
  const task=qualitySchedule?.find(x=>x.id===id);if(!task||completed(task))return;
- if(!canLog(task)){notify('Registre primeiro a produção do simulado. O painel não presume que ela foi feita.');return}
+ if(!canLog(task)){notify(task.type==='reforco_peca'?'Registre primeiro a produção e a correção de 45 minutos da mesma peça.':'Registre primeiro a produção do simulado.');return}
  const ref=prompt('Qual correção foi utilizada? Informe a edição da prova/espelho oficial ou a referência da correção pedagógica. Se não foi corrigido, cancele.');
  if(!ref||ref.trim().length<6)return;
  const evidence=prompt('Escreva o que você REESCREVEU e verificou (tese, fundamento, aplicação, pedido e resultado). Não basta marcar "li".');

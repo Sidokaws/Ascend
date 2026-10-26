@@ -21,20 +21,38 @@ function isoAfter(x,days){
  return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
 }
 function normalizeKey(v){return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('pt-BR')}
-function focusFor(m,index){
- const title=normalizeKey(m.title||'');
- const p=PRIMARY.find(x=>title.includes(normalizeKey(x.key)));
- return p?.key||PRIMARY[index%PRIMARY.length].key;
+function pieceForCorrection(c){
+ return plan.missions.find(m=>m.date===c.date&&['peca_completa','treino_guiado_peca'].includes(m.type))||null;
+}
+function actualPieceName(m){
+ if(!m)return 'Peça deste dia — vinculação a conferir';
+ return String(m.title||'').replace(/^(Oficina guiada de|Treino progressivo de)\s+/i,'')
+ .replace(/\s+[—–]\s+.*$/,'').trim();
+}
+function recall(piece){
+ const p=normalizeKey(piece);
+ if(p.startsWith('apelacao'))return 'interposição, juízo de origem e sequência das razões';
+ if(p.startsWith('memoriais'))return 'endereçamento, estrutura de mérito e pedidos';
+ if(p.startsWith('resposta a acusacao'))return 'endereçamento, fundamento e pedidos/testemunhas se cabíveis';
+ if(p==='rese')return 'interposição, eventual retratação (art. 589 do CPP) e razões';
+ if(p.startsWith('agravo em execucao'))return 'juízo da execução, fundamento, interposição e pedidos';
+ if(p.startsWith('contrarrazoes'))return 'petição de apresentação, destinatário e pedidos adequados à parte recorrida';
+ return 'destinatário, fundamento, estrutura e pedidos desta mesma medida';
 }
 function makeQualityPlan(){
  const entries=[],corrections=plan.missions.filter(m=>m.type==='correcao'),sims=plan.simulations;
- corrections.forEach((m,i)=>{
- const prior=plan.missions.filter(x=>x.date===m.date&&['peca_completa','treino_guiado_peca'].includes(x.type));
- const focus=prior.length?focusFor(prior[0],i):PRIMARY[i%6].key;
- entries.push({id:ID+'RET-'+m.date.replace(/-/g,''),date:m.date,mins:15,type:'reforco_peca',
- focus,source_id:m.id,depends_on:prior[0]?.id||null,
- title:'Reescrita de alta precisão — '+focus,
- instruction:'Após a correção de 45 min já prevista: 3 min refaça a estrutura de memória; 9 min reescreva o bloco TBFP/pedido mais fraco; 3 min confira Vade + registre erro e reteste. Se for peça secundária, faça a correção normal dessa peça e use os 15 min para uma das seis principais. Não dá XP automático.'});
+ corrections.forEach(c=>{
+ const prior=pieceForCorrection(c),piece=actualPieceName(prior),caseId=prior?.piece_case_id||'não identificado';
+ const steps=[
+ '3 min — SEM MODELO: escreva de memória '+recall(piece)+'.',
+ '9 min — REESCRITA: escolha UM erro ou omissão da correção de '+piece+' (por exemplo artigo, tese TBFP, pedido, ou estrutura) e REESCREVA o trecho correspondente. Se nenhum erro foi identificado, reproduza sem consultar um fundamento ou pedido já correto, para testar a memória.',
+ '3 min — CONFERÊNCIA: compare seu novo trecho com a correção e o Vade. Anote se corrigiu a falha e qual revisão fará.'
+ ];
+ entries.push({id:ID+'RET-'+c.date.replace(/-/g,''),date:c.date,mins:15,type:'reforco_peca',
+ focus:piece,caseId,source_id:c.id,depends_on:prior?.id||null,
+ title:'Reteste da peça de hoje — '+piece+' ('+caseId+')',steps,
+ deliverable:'Um trecho de '+piece+' reescrito, conferido e registrado. Não escrever uma peça inteira em 15 minutos.',
+ instruction:steps.join(' ')});
  });
  sims.filter(s=>[3,5,7,8,10,11,12,14,15,16].includes(Number(s.week))).forEach(s=>{
  const next=isoAfter(s.date,1);
@@ -54,6 +72,7 @@ function ensure(){
 }
 function completed(s){return !!state.qualityRecords?.[s.id]?.complete}
 function canLog(s){
+ if(s.type==='reforco_peca')return !!(s.depends_on&&state.missions[s.depends_on]?.evidence&&state.missions[s.source_id]?.evidence);
  if(s.type!=='correcao_simulado')return true;
  const sim=plan.simulations.find(x=>x.id===s.focus);
  if(!sim)return false;
@@ -68,8 +87,8 @@ function qualityContext(){
  const done=qualitySchedule.filter(completed);
  const byType=t=>qualitySchedule.filter(x=>x.type===t);
  const official='Padrões oficiais: <a href="https://examedeordem.oab.org.br/EditaisProvas" target="_blank" rel="noopener noreferrer">Exame de Ordem (OAB)</a>. Quando inexistente, indicar "pedagógico"; não simular distribuição oficial de pontos.';
- $('qualityStats').innerHTML='<div class="quality-summary"><div><small>RETTESTES DAS PEÇAS</small><strong>'+done.filter(x=>x.type==='reforco_peca').length+' / '+byType('reforco_peca').length+'</strong><small>+15 min cada, focados nas 6</small></div><div><small>PÓS-SIMULADO</small><strong>'+done.filter(x=>x.type==='correcao_simulado').length+' / '+byType('correcao_simulado').length+'</strong><small>+45 min após teste realizado</small></div><div><small>TEMPO DE CORREÇÃO EXTRA</small><strong>16h</strong><small>8h30 retestes + 7h30 correções de 10 simulados</small></div><div><small>CARGA MÁXIMA PROJETADA</small><strong>335h</strong><small>Teoria já dentro dos 334h-base; 5 simulados convertidos</small></div></div>'
- +'<div class="notice">A programação de 34 correções originais com 45 min foi preservada. O bloco de +15 min é específico para recuperação escrita. As 10 correções pós-simulado (45min) são condicionais, somente após realmente realizar o teste. Não ocupar sábado nem 22–27/02 (Revisão Turbo).</div>';
+ $('qualityStats').innerHTML='<div class="quality-summary"><div><small>RETESTES DAS PEÇAS</small><strong>'+done.filter(x=>x.type==='reforco_peca').length+' / '+byType('reforco_peca').length+'</strong><small>15 min da própria peça, incluídos no dia</small></div><div><small>PÓS-SIMULADO</small><strong>'+done.filter(x=>x.type==='correcao_simulado').length+' / '+byType('correcao_simulado').length+'</strong><small>45 min após prova, incluídos no dia</small></div><div><small>TEMPO DE REVISÃO RESERVADO</small><strong>16h</strong><small>8h30 retestes + 7h30 correções de 10 simulados</small></div><div><small>CARGA MÁXIMA PROJETADA</small><strong>335h</strong><small>Teoria já dentro dos 334h-base; 5 simulados convertidos</small></div></div>'
+ +'<div class="notice">As 34 correções originais de 45 min foram preservadas. Os retestes de 15 min trabalham apenas a peça corrigida no mesmo dia, nunca uma peça escolhida por rodízio. Os dez pós-simulados de 45 min só ocorrem após a prova. Todos os tempos já fazem parte das 335h. Não ocupar sábado nem 22–27/02 (Revisão Turbo).</div>';
  $('qualityPrimary').innerHTML=PRIMARY.map((p,i)=>'<div class="item"><div class="section-head"><span class="tag blue">FOCO '+(i+1)+'</span><b class="small">'+qesc(p.key)+'</b></div><p class="item-meta">'+qesc(p.description)+'</p><p class="item-meta">Treino: reconhecer → estrutura → escrever → corrigir → reescrever → caso diferente. Repetir até desempenho demonstrado, sem presumir domínio.</p></div>').join('');
  $('qualityExamRules').innerHTML='<div class="quality-two"><div><b>Prova histórica não resolvida</b><p class="muted small">Vale como primeira exposição. O treino é legítimo mesmo que o enunciado tenha aparecido em provas anteriores. Conferir se o padrão corresponde à edição usada.</p></div><div><b>Segundo contato com o mesmo caso</b><p class="muted small">Vale como revisão e treino de velocidade, mas não como prova independente. O painel registra a exposição declarada.</p></div><div><b>Simulado autoral de chat separado</b><p class="muted small">Peça-surpresa + 4 discursivas, 5 horas, sem prévia do enunciado. Espelho pedagógico pontuado; nunca rotular como FGV oficial.</p></div><div><b>Último domingo, 21/02</b><p class="muted small">Janela SIM-15 do plano original: convertido em revisão final de 2h, sem prova completa no domingo anterior à Revisão Turbo. Não agendar correção na Revisão Turbo a partir de 22/02.</p></div></div><p class="muted small">'+official+'</p>'
  +'<details class="item"><summary>Registrar contato anterior com cada caso</summary><p class="muted small">Não confunde origem do material com experiência pessoal; origem FGV ou CEISC deve ser confirmada nas fontes.</p>'

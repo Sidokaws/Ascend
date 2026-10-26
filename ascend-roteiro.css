@@ -1,0 +1,28 @@
+.exe-guide{margin:14px 0 18px;padding:16px;border:1px solid #4f6289;border-radius:12px;background:linear-gradient(130deg,#101d35,#17142c);color:#e7efff}
+.exe-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;border-bottom:1px solid #344a70;padding-bottom:10px}
+.exe-heading .eyebrow{font-size:10px;letter-spacing:.12em;color:#8ccbec}
+.exe-heading h3{font-size:17px;margin:5px 0 6px}
+.exe-heading p{font-size:12px;color:#a6bdd9;margin:2px 0}
+.exe-heading>strong{white-space:nowrap;font-size:18px;color:#bcddff}
+.exe-intro,.exe-footer{font-size:12px;line-height:1.65;color:#b1c4dd}
+.exe-footer{margin:12px 0 0;padding-top:9px;border-top:1px solid #354866}
+.exe-task{border:1px solid #385171;background:#111a2e;border-radius:9px;margin:8px 0}
+.exe-task summary{display:flex;gap:9px;align-items:center;padding:12px;cursor:pointer;list-style:none}
+.exe-task summary::-webkit-details-marker{display:none}
+.exe-task summary>b{color:#a3d6fa;white-space:nowrap;font-size:12px}
+.exe-task summary>span{flex:1;font-weight:600;font-size:12px;line-height:1.45}
+.exe-task summary>small{font-size:10px;color:#9db4cd;text-align:right}
+.exe-task[open] summary{border-bottom:1px solid #354866;background:#182941}
+.exe-task>.btn{margin:1px 13px 13px}
+.exe-substeps{margin:10px 15px 12px 31px;padding:0;display:flex;flex-direction:column;gap:9px}
+.exe-substeps li{font-size:12px;line-height:1.75;color:#c4d5eb;padding-left:3px;overflow-wrap:anywhere}
+.exe-substeps li>b{color:#aee2ff}
+.exe-sources{margin:5px 0;padding-left:15px;list-style:'▹  '}
+.exe-sources li{font-size:11px;color:#92b7dd}
+.exe-deliverable,.exe-locked,.exe-warning{font-size:12px;line-height:1.65;margin:10px 13px}
+.exe-deliverable{color:#bad4f4}
+.exe-locked{padding:9px;background:#2b2634;border-left:2px solid #dcbb79;border-radius:4px}
+.exe-warning{color:#ffd1a0}
+.quality-step-list,.quality-steps{padding-left:22px;font-size:12px;line-height:1.75;color:#c2d6ec}
+.quality-step-list li,.quality-steps li{margin:8px 0}
+@media(max-width:640px){.exe-guide{padding:12px}.exe-task summary{flex-wrap:wrap}.exe-task summary>small{min-width:100%;text-align:left}.exe-heading h3{font-size:15px}}

@@ -1,0 +1,22 @@
+.pdf-library,.pdf-day{margin:14px 0;padding:17px;border:1px solid #4f6086;border-radius:12px;background:linear-gradient(135deg,#0c1e37,#1a1739);color:#e7f3ff}
+.pdf-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.pdf-head small{letter-spacing:.12em;font-size:10px;color:#83addc}
+.pdf-head h3{font-size:17px;color:#f3faff;margin:6px 0 3px}
+.pdf-pill{display:inline-flex;white-space:nowrap;border:1px solid #6286aa;background:#273a59;border-radius:30px;padding:5px 10px;font-size:10px;color:#d7ebff}
+.pdf-library p{color:#bed3ea;line-height:1.7;font-size:12px;margin:10px 0}
+.pdf-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:12px 0}
+.pdf-library .pdf-count{background:#0b142b;padding:9px 12px;border:1px solid #334b73;border-radius:6px}
+.pdf-note{font-size:11px!important;color:#8caed1!important}
+.pdf-warning{background:#362c33;border-left:3px solid #e9ad7c;padding:9px;color:#ffd3ae;font-size:12px;line-height:1.65;border-radius:6px}
+.pdf-day .section-head{margin:0 0 12px;align-items:center}
+.pdf-day .section-head strong{font-size:14px}
+.pdf-day-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.pdf-day-item{display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;gap:8px;padding:11px 12px;background:#111e34;border:1px solid #32496f;border-radius:8px;min-width:0}
+.pdf-day-item span{font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+.pdf-day-item small{display:block;color:#96aecd;font-size:10px;margin-top:2px}
+.pdf-in-row{margin:9px 0 2px;display:flex;flex-wrap:wrap;gap:7px}
+.pdf-source{white-space:normal;text-align:left;font-size:11px;max-width:100%;line-height:1.4;overflow-wrap:anywhere}
+.pdf-found{border-color:#5a96a7!important}
+.pdf-missing{border-color:#9a724e!important}
+.pdf-existing-button{cursor:pointer}
+@media(max-width:730px){.pdf-day-grid{grid-template-columns:1fr}.pdf-head{flex-direction:column;gap:7px}.pdf-library,.pdf-day{padding:13px}.pdf-actions{flex-direction:column;align-items:stretch}.pdf-actions .btn{width:100%}}

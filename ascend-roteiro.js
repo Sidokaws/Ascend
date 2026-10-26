@@ -88,7 +88,7 @@ function renderDayPlan(){
  const allocated=(budget.type==='peca'?15:0)+(correction45?45:0);
  const amount=counted+allocated;
  const warning=amount!==budget.minutes?'<p class="exe-warning">Há diferença entre a soma das etapas exibidas ('+amount+' min) e o orçamento diário ('+budget.minutes+' min). NÃO acrescente tarefas para compensar; solicite conferência da data.</p>':'';
- target.innerHTML='<section class="exe-guide">'+heading+'<p class="exe-intro">Abra o primeiro exercício, execute e registre a tentativa. Os seguintes permanecem aqui para você visualizar o dia, mas não consulte padrões antes de responder. As leituras estão dentro destes tempos.</p>'
+ target.innerHTML='<section class="exe-guide">'+heading+'<p class="exe-intro">Este é o roteiro das MESMAS missões que aparecem nos cartões de registro mais abaixo — não são tarefas duplicadas. Abra a primeira, execute e registre. As demais estão recolhidas para você seguir a ordem. Só consulte padrões após produzir sua resposta. PDFs e slides entram nesses tempos.</p>'
  +'<div class="exe-tasks">'+tasks+(budget.type==='peca'?retest(day):'')+correction45+'</div>'
  +'<div class="exe-footer"><b>Tempo total: '+hh(budget.minutes)+'</b> · '+base.length+' missão(ões)-base'+(allocated?' + '+allocated+' min de correção/reteste já orçados':'')+'. Não somar outro bloco teórico de 45 min.</div>'+warning+'</section>';
 }

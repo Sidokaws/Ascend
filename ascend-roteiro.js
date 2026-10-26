@@ -33,6 +33,13 @@ function sourceList(m,step){
  if(source.length===0)return '';
  return '<ul class="exe-sources">'+source.map(f=>'<li>'+esc(f.arquivo)+(Array.isArray(f.paginas)?' • pp. '+esc(f.paginas[0])+'–'+esc(f.paginas[1]??f.paginas[0]):'')+'</li>').join('')+'</ul>';
 }
+function activityTitle(m,day){
+ if(m.type!=='correcao')return m.title;
+ const piece=plan.missions.find(x=>x.date===day.date&&['peca_completa','treino_guiado_peca'].includes(x.type));
+ if(!piece)return 'Correção vinculada à produção deste dia — conferir atividade';
+ const type=String(piece.title||'peça').replace(/^(Oficina guiada de|Treino progressivo de)\s+/i,'').replace(/\s+[—–]\s+.*$/,'');
+ return 'Corrigir '+type+' — caso '+(piece.piece_case_id||'a identificar');
+}
 function numberedSteps(m){
  if(m.type==='simulado_completo')return '<ol class="exe-substeps"><li>Prepare o material permitido e verifique a liberação da prova.</li><li>Faça uma peça completa e quatro discursivas A/B, sem consultar respostas.</li><li>Confira pedidos, fundamentos e registre o tempo. Corrija somente depois do envio.</li></ol>';
  if(m.type==='correcao'){
@@ -69,7 +76,7 @@ function renderDayPlan(){
   const submitted=!!state.missions[m.id]?.evidence;
   const sameDayPiece=base.find(x=>['peca_completa','treino_guiado_peca'].includes(x.type));
   const locked=m.type==='correcao'&&!!sameDayPiece&&!state.missions[sameDayPiece.id]?.evidence;
-  return '<details class="exe-task" '+(i===0?'open':'')+'><summary><b>'+esc(m.duration_min||0)+' min</b><span>'+esc(m.title)+'</span><small>'+(submitted?'Tentativa registrada':locked?'Após produzir a peça':'Abrir instruções')+'</small></summary>'
+  return '<details class="exe-task" '+(i===0?'open':'')+'><summary><b>'+esc(m.duration_min||0)+' min</b><span>'+esc(activityTitle(m,day))+'</span><small>'+(submitted?'Tentativa registrada':locked?'Após produzir a peça':'Abrir instruções')+'</small></summary>'
   +(m.type==='simulado_completo'?'<p class="exe-locked">Enunciados da prova permanecem bloqueados até a liberação da atividade. Nenhum gabarito será mostrado aqui.</p>':'')
   +numberedSteps(m)
   +'<p class="exe-deliverable"><b>Entregar:</b> '+esc(m.deliverable||m.evidence_required||'Produção escrita verificável')+'</p>'

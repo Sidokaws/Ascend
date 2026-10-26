@@ -1,0 +1,8 @@
+/* ASCEND // COPIAR RELATÓRIO: extensão isolada da V2.1 */
+.copy-report-button{margin-left:6px;border-color:#5b8dc0!important;white-space:normal;line-height:1.45}
+#copyMissionInDialog{border-color:#6d94ce;white-space:normal}
+#copyMissionNote{line-height:1.55}
+.copy-export-dialog{width:min(810px,95vw)}
+.copy-export-dialog textarea{min-height:260px;width:100%;font:12px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre-wrap;resize:vertical}
+.item-actions{flex-wrap:wrap;gap:8px}
+@media(max-width:650px){#missionForm>.actions{flex-direction:column;align-items:stretch}#missionForm>.actions .btn{width:100%}.copy-report-button{margin-left:0}}

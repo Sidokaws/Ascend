@@ -67,13 +67,14 @@ function renderDayPlan(){
  const heading='<div class="exe-heading"><div><span class="eyebrow">EXECUÇÃO PARAMETRIZADA • '+esc(day.day_id)+'</span><h3>O que fazer hoje, na ordem</h3><p>'+esc(day.objetivo_do_dia||day.topic||'Treinamento')+'</p></div><strong>'+hh(budget.minutes)+'</strong></div>';
  const tasks=base.map((m,i)=>{
   const submitted=!!state.missions[m.id]?.evidence;
-  const locked=m.type==='correcao'&&!submitted&&!state.missions[base.find(x=>['peca_completa','treino_guiado_peca'].includes(x.type))?.id]?.evidence;
+  const sameDayPiece=base.find(x=>['peca_completa','treino_guiado_peca'].includes(x.type));
+  const locked=m.type==='correcao'&&!!sameDayPiece&&!state.missions[sameDayPiece.id]?.evidence;
   return '<details class="exe-task" '+(i===0?'open':'')+'><summary><b>'+esc(m.duration_min||0)+' min</b><span>'+esc(m.title)+'</span><small>'+(submitted?'Tentativa registrada':locked?'Após produzir a peça':'Abrir instruções')+'</small></summary>'
   +(m.type==='simulado_completo'?'<p class="exe-locked">Enunciados da prova permanecem bloqueados até a liberação da atividade. Nenhum gabarito será mostrado aqui.</p>':'')
   +numberedSteps(m)
   +'<p class="exe-deliverable"><b>Entregar:</b> '+esc(m.deliverable||m.evidence_required||'Produção escrita verificável')+'</p>'
   +'<p class="exe-deliverable"><b>Concluído quando:</b> '+esc(m.success_condition||'Produção enviada e corrigida pelo mentor')+'</p>'
-  +'<button type="button" class="btn small-btn" data-open-mission="'+esc(m.id)+'">'+(submitted?'Consultar tentativa / correção':'Abrir atividade para registrar produção')+'</button></details>';
+  +(locked?'<button type="button" class="btn small-btn" disabled aria-disabled="true">Aguardando tentativa da peça anterior</button>':'<button type="button" class="btn small-btn" data-open-mission="'+esc(m.id)+'">'+(submitted?'Consultar tentativa / correção':'Abrir atividade para registrar produção')+'</button>')+'</details>';
  }).join('');
  const correction45=budget.type==='regular'&&day.weekday==='segunda-feira'&&TEST_WEEKS.has(Number(day.week)-1)?
  '<details class="exe-task"><summary><b>45 min</b><span>Correção do simulado de domingo</span><small>Após prova efetivamente realizada</small></summary><ol class="exe-substeps"><li>12 min: conferir a peça pelo espelho oficial identificado ou correção pedagógica.</li><li>18 min: conferir os itens A/B das quatro questões e seus fundamentos.</li><li>10 min: reescrever o item de maior perda.</li><li>5 min: registrar erros e revisões futuras.</li></ol><p class="exe-deliverable">Esta correção já faz parte das 3h45 da segunda-feira.</p></details>':'';

@@ -45,7 +45,7 @@ function makeQualityPlan(){
  const prior=pieceForCorrection(c),piece=actualPieceName(prior),caseId=prior?.piece_case_id||'não identificado';
  const steps=[
  '3 min — SEM MODELO: escreva de memória '+recall(piece)+'.',
- '9 min — REESCRITA: escolha UM erro ou omissão da correção de '+piece+' (por exemplo artigo, tese TBFP, pedido, ou estrutura) e REESCREVA o trecho correspondente. Se nenhum erro foi identificado, reproduza sem consultar um fundamento ou pedido já correto, para testar a memória.',
+ '9 min — REESCRITA: escolha UM erro ou omissão da correção de '+piece+' (por exemplo artigo, tese TBFP, pedido, ou estrutura) e REESCREVA ESSE TRECHO DE MEMÓRIA, SEM COPIAR A CORREÇÃO recém-feita. Se nenhum erro foi identificado, reproduza sem consultar um fundamento ou pedido já correto, para testar a memória.',
  '3 min — CONFERÊNCIA: compare seu novo trecho com a correção e o Vade. Anote se corrigiu a falha e qual revisão fará.'
  ];
  entries.push({id:ID+'RET-'+c.date.replace(/-/g,''),date:c.date,mins:15,type:'reforco_peca',

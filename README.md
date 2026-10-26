@@ -1,5 +1,14 @@
 # SYSTEM // ASCEND — OAB 48 · V3 + roteiro executável V1.2
 
+## Copiar produção completa para corrigir no ChatGPT — 26/10/2026
+
+Na janela de missão o formulário agora tem **Salvar tentativa no ASCEND** e **⧉ Copiar para o ChatGPT**. O segundo gera uma mensagem completa com ID, data, título, tipo, questão/caso, status, tempo planejado/real, cronômetro bruto-pausas-efetivo quando existente, etapa declarada, fonte, páginas, materiais efetivamente consultados e **texto integral colocado em Produção/Evidência**. Link de foto/documento é incluído como referência, mas **não envia/anexa o arquivo**. Campos não preenchidos são descritos como não informados; gabarito não é antecipado.
+
+Após salvar, a atividade também exibe **⧉ Copiar para o ChatGPT** no cartão do dia. O botão no formulário permite copiar rascunhos ainda não salvos, explicitamente sinalizados: a cópia não substitui o salvamento. A funcionalidade usa a área de transferência do próprio navegador, com caixa de cópia manual em caso de bloqueio. **Não existe comunicação automática entre GitHub Pages e esta conversa.** Cole aqui com Ctrl+V.
+
+A implementação usa dois arquivos `ascend-copiar.js` e `ascend-copiar.css` e alterações restritas ao formulário e às importações em `index.html`. **Não modifica o cronograma, as horas, o sistema de pontuação, os PDFs ou avaliações históricas**. Dados opcionais sobre consulta são gravados no mesmo estado local do backup V3, por missão, após salvar uma produção válida.
+
+
 ## Biblioteca privada de PDFs — 26/10/2026
 
 **Acesso direto sem publicar o CEISC:** o ASCEND agora tem a opção **Conectar pasta de PDFs** na aba **Teoria: e-books e slides**. Escolha uma vez a pasta local dos PDFs da OAB; o site relaciona o nome indicado no cronograma com o arquivo e abre o documento na página citada (`#page=N`). Também há botões individuais no painel do dia e nas instruções das missões.

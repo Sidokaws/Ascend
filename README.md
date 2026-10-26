@@ -1,5 +1,14 @@
 # SYSTEM // ASCEND — OAB 48 · V3 + roteiro executável V1.2
 
+## Biblioteca privada de PDFs — 26/10/2026
+
+**Acesso direto sem publicar o CEISC:** o ASCEND agora tem a opção **Conectar pasta de PDFs** na aba **Teoria: e-books e slides**. Escolha uma vez a pasta local dos PDFs da OAB; o site relaciona o nome indicado no cronograma com o arquivo e abre o documento na página citada (`#page=N`). Também há botões individuais no painel do dia e nas instruções das missões.
+
+Nenhum material protegido foi adicionado ao repositório público, nem senha frágil colocada no JavaScript. Os dados permanecem no dispositivo; a autorização da pasta é guardada pelo navegador quando ele permite, podendo exigir nova confirmação. PDFs enviados à Biblioteca do ChatGPT não possuem acesso automático por um site externo. **Não foi criado ZIP dos originais**, pois sua materialização não estava disponível.
+
+[Guia de configuração e segurança da biblioteca privada](docs/biblioteca-pdfs-privada-v2.1.md).
+
+
 ## PLANO VIGENTE: V2.1 SUSTENTÁVEL (21/10/2026)
 
 **Este é o orçamento de tempo que prevalece sobre referências antigas abaixo:** **335 horas nas 17 semanas**, média de **3h17 por dia ativo**. Aulas de e-books, slides e modelos são **integradas** às 334 horas-base, sem 63h45 adicionais. Mantemos 34 retestes de 15 minutos e corrigimos **10 simulados de 5 horas**, com 45 minutos de triagem na segunda seguinte; cinco domingos antes reservados a simulado viram 2 horas de revisão. Sábados livres, Revisão Turbo (22–27/02) separada.

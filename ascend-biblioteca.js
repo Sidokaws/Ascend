@@ -106,12 +106,12 @@
   if(!isPdf(name))return null;
   const key=normalize(name),hint=aliases[key]?.path;
   if(hint&&index.has(hint))return index.get(hint);
+  const remembered=indexedFiles.find(x=>x.key===key);
+  if(remembered)return {stored:true,name:remembered.name,key};
   const exact=[...index.values()].filter(x=>x.key===key);
   if(exact.length===1)return exact[0];
   // Nunca chutar com nomes similares: risco de abrir material incorreto.
   if(exact.length>1)return {ambiguous:exact.map(x=>x.path)};
-  const remembered=indexedFiles.find(x=>x.key===key);
-  if(remembered)return {stored:true,name:remembered.name,key};
   return null;
  }
  async function loadSingle(expected){
@@ -199,7 +199,7 @@
   const rows=$pdf('theorySchedule')?.querySelectorAll?.('.theory-row')||[];
   const planned=plan?.days?.filter(d=>d.weekday!=='sábado'&&d.weekday!=='domingo')||[];
   rows.forEach((row,i)=>{
-   if(row.querySelector('.pdf-in-row'))return;
+   const previous=row.querySelector('.pdf-in-row');if(previous)previous.remove();
    const date=planned[i]?.date;if(!date)return;
    const refs=state.missions['LEIT-'+date.replace(/-/g,'')]?.sources_detailed||[];
    const valid=refs.filter(f=>importantName(f.arquivo)).slice(0,3);

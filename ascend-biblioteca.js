@@ -135,8 +135,8 @@
    setTimeout(()=>URL.revokeObjectURL(url),10*60*1000);
   }catch(e){URL.revokeObjectURL(url);throw e}
  }
- async function openDocument(name,page){
-  if(isRestricted(name)){notify('Espelhos e gabaritos só devem ser abertos depois da tentativa e liberação de correção.');return}
+ async function openDocument(name,page,authorizedRestricted=false){
+  if(isRestricted(name)&&!authorizedRestricted){notify('Espelhos e gabaritos só devem ser abertos depois da tentativa e liberação de correção.');return}
   let existing=findMatch(name);
   if(!existing){
    notify('PDF ainda não associado. Selecione a pasta da OAB ou associe o arquivo correto na Biblioteca.');
@@ -189,6 +189,10 @@
  }
  function dayButtons(){
   const el=$pdf('dayPdfLinks');if(!el)return;
+  if(selectedDate==='2026-10-26'&&!state?.missions?.['ASC-20261026-01']?.evidence){
+   el.innerHTML='<div class="pdf-day"><b>Biblioteca do Dia 1</b><p class="pdf-note">Primeiro responda aos seis mini-casos do diagnóstico, sem pistas. Após registrar sua tentativa, os links para os slides e e-books do dia serão liberados aqui.</p></div>';
+   return;
+  }
   const items=listNeededForDate(selectedDate);
   if(!items.length){el.innerHTML='';return}
   el.innerHTML='<div class="pdf-day"><div class="section-head"><strong>Materiais indicados para este dia</strong><span class="muted small">Abertura na página prevista</span></div>'
@@ -259,8 +263,12 @@
    if(!btn)return;
    e.preventDefault();e.stopPropagation();e.stopImmediatePropagation?.();
    const name=btn.dataset.pdfName,page=btn.dataset.pdfPage;
+   const mission=state?.missions?.[$pdf('missionForm')?.elements?.id?.value];
+   const inSubmittedMission=!!(btn.closest('#missionDialog')&&mission?.evidence);
+   const restrictedAllowed=inSubmittedMission&&(mission.type!=='simulado_completo'||mission.release_state==='full');
+   if(isRestricted(name)&&!restrictedAllowed){notify('Correção bloqueada até a tentativa escrita e sua liberação.');return}
    if(!findMatch(name)){singlePicker(name);return}
-   openDocument(name,page);
+   openDocument(name,page,restrictedAllowed);
   },true);
   initLibrary();
  }

@@ -6,8 +6,8 @@
  */
 (function(){
  const DB_NAME='AscendPdfLocalV1', STORE='handles', HANDLE_KEY='studyFolder', FILE_PREFIX='file:', ALIAS_KEY='ascendPdfMappingV1';
- const MAX_SCAN=2000, MAX_DAY=14;
- let dbPromise=null,dirHandle=null,index=new Map(),indexedFiles=[],status='inicializando',errorMsg='',connectedMode='nenhum';
+ const MAX_SCAN=2000, MAX_DAY=14, FOLDER_MANIFEST_KEY='ascendPdfFolderManifestV1';
+ let dbPromise=null,dirHandle=null,index=new Map(),indexedFiles=[],status='inicializando',errorMsg='',connectedMode='nenhum',libraryReady=null;
  let aliases={};
  try{aliases=JSON.parse(localStorage.getItem(ALIAS_KEY)||'{}')}catch{aliases={}}
  const $pdf=id=>document.getElementById(id);
@@ -42,6 +42,10 @@
   await new Promise(resolve=>{try{const req=db.transaction(STORE,'readwrite').objectStore(STORE).delete(key);
    req.onsuccess=()=>resolve();req.onerror=()=>resolve()}catch{resolve()}});
  }
+ function saveFolderManifest(){
+  // Apenas nomes de arquivos; nunca salva nem publica o conteúdo do PDF.
+  try{localStorage.setItem(FOLDER_MANIFEST_KEY,JSON.stringify([...index.values()].map(x=>({name:x.name,path:x.path,key:x.key}))))}catch{}
+ }
  function rememberAlias(expected,actual){
   aliases[normalize(expected)]={path:actual,name:expected};try{localStorage.setItem(ALIAS_KEY,JSON.stringify(aliases))}catch{}
  }
@@ -75,7 +79,7 @@
   try{
    const permission=await dirHandle.queryPermission({mode:'read'});
    if(permission!=='granted'){status='reautorizar';connectedMode='pasta';return}
-   index.clear();await scan(dirHandle);
+   index.clear();await scan(dirHandle);saveFolderManifest();
    status='pronto';connectedMode='pasta';
   }catch(err){status='reautorizar';errorMsg=String(err.message||err)}
  }
@@ -89,7 +93,7 @@
    status='indexando';paint();
    const temp=new Map();const prev=index;index=temp;
    try{await scan(selected)}catch(e){index=prev;throw e}
-   dirHandle=selected;const saved=await saveLocal(HANDLE_KEY,selected);
+   dirHandle=selected;saveFolderManifest();const saved=await saveLocal(HANDLE_KEY,selected);
    status='pronto';connectedMode='pasta';errorMsg=saved?'':'O navegador não permitiu salvar a autorização. Esta sessão permanece conectada, mas pode exigir nova seleção depois.';
    paint();
   }catch(err){if(err?.name!=='AbortError'){status=index.size?'pronto':'desconectado';errorMsg='Não foi possível conectar: '+String(err.message||err);paint()}}
@@ -99,19 +103,29 @@
   try{
    const granted=await dirHandle.requestPermission({mode:'read'});
    if(granted!=='granted'){errorMsg='A pasta não foi autorizada.';paint();return}
-   index.clear();await scan(dirHandle);status='pronto';errorMsg='';paint();
+   index.clear();await scan(dirHandle);saveFolderManifest();status='pronto';errorMsg='';paint();
   }catch(e){errorMsg='Falha na autorização: '+String(e.message||e);paint()}
  }
  function findMatch(name){
   if(!isPdf(name))return null;
   const key=normalize(name),hint=aliases[key]?.path;
-  if(hint&&index.has(hint))return index.get(hint);
-  const remembered=indexedFiles.find(x=>x.key===key);
-  if(remembered)return {stored:true,name:remembered.name,key};
+  // Associações anteriores ficam sempre em primeiro lugar, inclusive PDFs avulsos.
+  const cached=indexedFiles.find(x=>x.key===key);
+  if(cached)return {stored:true,name:cached.name,key};
+  if(hint){
+   const related=indexedFiles.find(x=>x.key===normalize(hint));
+   if(related)return {stored:true,name:related.name,key:related.key};
+   if(index.has(hint))return index.get(hint);
+   const byHint=[...index.values()].filter(x=>x.name===hint||x.key===normalize(hint));
+   if(byHint.length===1)return byHint[0];
+  }
   const exact=[...index.values()].filter(x=>x.key===key);
   if(exact.length===1)return exact[0];
-  // Nunca chutar com nomes similares: risco de abrir material incorreto.
   if(exact.length>1)return {ambiguous:exact.map(x=>x.path)};
+  // Chrome/Edge podem exigir confirmação após reiniciar o navegador.
+  // Isso NÃO significa que os PDFs foram desvinculados e NÃO abre seletor de arquivo.
+  if(dirHandle&&(status==='reautorizar'||status==='inicializando'))return {needsPermission:true,name};
+  if(status==='inicializando')return {restoring:true,name};
   return null;
  }
  async function loadSingle(expected){
@@ -135,22 +149,48 @@
    setTimeout(()=>URL.revokeObjectURL(url),10*60*1000);
   }catch(e){URL.revokeObjectURL(url);throw e}
  }
- async function openDocument(name,page,authorizedRestricted=false){
-  if(isRestricted(name)&&!authorizedRestricted){notify('Espelhos e gabaritos só devem ser abertos depois da tentativa e liberação de correção.');return}
-  let existing=findMatch(name);
-  if(!existing){
-   notify('PDF ainda não associado. Selecione a pasta da OAB ou associe o arquivo correto na Biblioteca.');
-   const hub=$pdf('pdfLibraryHub');hub?.scrollIntoView?.({behavior:'smooth',block:'center'});
-   return;
+ async function openDocument(name,page,authorizedRestricted=false,popup=null){
+  if(isRestricted(name)&&!authorizedRestricted){popup?.close();notify('Espelhos e gabaritos só devem ser abertos depois da tentativa e liberação de correção.');return}
+  const existing=findMatch(name);
+  if(!existing||existing.needsPermission||existing.restoring){
+   popup?.close();
+   notify('A biblioteca local precisa terminar de carregar ou reautorizar a pasta. Não é necessário selecionar o PDF novamente.');
+   paint();return;
   }
-  if(existing.ambiguous){errorMsg='PDF duplicado: '+name+'. Selecione a versão correta na biblioteca.';paint();notify(errorMsg);return}
-  // Abre aba enquanto o clique ainda tem ativação; não publica conteúdo.
-  const popup=window.open('about:blank','_blank');
+  if(existing.ambiguous){popup?.close();errorMsg='PDF duplicado: '+name+'. Associe apenas a versão correta na biblioteca.';paint();notify(errorMsg);return}
+  const tab=popup||window.open('about:blank','_blank');
   try{
    const file=await loadSingle(name);
-   if(!file||!isPdf(file.name))throw new Error('Não é um PDF válido');
-   openBlob(file,page,popup);
-  }catch(e){try{popup?.close()}catch{}errorMsg=String(e.message||e);paint();notify(errorMsg)}
+   if(!file||!isPdf(file.name))throw new Error('Arquivo não é PDF');
+   openBlob(file,page,tab);
+  }catch(e){
+   try{tab?.close()}catch{}
+   errorMsg=String(e.message||e);paint();notify(errorMsg);
+  }
+ }
+ // Reautorização sem perder os arquivos que já foram associados.
+ // O clique cria a aba ANTES de operações assíncronas para evitar bloqueio de pop-ups.
+ async function resumeFolderPdf(name,page,allowed){
+  const popup=window.open('about:blank','_blank');
+  try{
+   if(status==='inicializando'&&libraryReady)await libraryReady;
+   if(status==='reautorizar'&&dirHandle){
+    // Chamado a partir da interação do usuário. O navegador pode exigir autorização.
+    const permission=await dirHandle.requestPermission({mode:'read'});
+    if(permission!=='granted')throw new Error('O navegador ainda não autorizou a pasta original. Use "Reautorizar acesso à pasta", sem importar os PDFs novamente.');
+    index.clear();await scan(dirHandle);saveFolderManifest();
+    status='pronto';connectedMode='pasta';errorMsg='';paint();
+   }
+   if(!findMatch(name)||findMatch(name)?.needsPermission){
+    popup?.close();
+    errorMsg='Não encontrei '+name+' na pasta salva. Verifique o nome na biblioteca antes de associar um arquivo individual.';
+    paint();notify(errorMsg);return;
+   }
+   await openDocument(name,page,allowed,popup);
+  }catch(err){
+   popup?.close();
+   errorMsg=String(err.message||err);paint();notify(errorMsg);
+  }
  }
  function listNeededForDate(date){
   if(!plan)return [];
@@ -169,9 +209,11 @@
   return results.slice(0,MAX_DAY);
  }
  function buttonHtml(x){
-  const present=findMatch(x.name),found=!!present&&!present.ambiguous;
+  const present=findMatch(x.name),found=!!present&&!present.ambiguous&&!present.needsPermission&&!present.restoring;
+  const pendingPermission=!!present?.needsPermission,loading=status==='inicializando';
+  const caption=found?'📖 Abrir PDF':pendingPermission?'🔓 Reautorizar pasta':loading?'⏳ Recuperando biblioteca':'📁 Localizar PDF';
   return '<button type="button" class="btn small-btn pdf-source '+(found?'pdf-found':'pdf-missing')+'" data-pdf-name="'+escape(x.name)+'" data-pdf-page="'+x.page+'" title="'+escape(x.name)+'">'
-  +(found?'📖 Abrir PDF':'⚠ Associar PDF')+' · p. '+x.page+'</button>';
+  +caption+' · p. '+x.page+'</button>';
  }
  function hub(){
   const el=$pdf('pdfLibraryHub');if(!el)return;
@@ -218,7 +260,7 @@
   const root=$pdf('missionDialog');if(!root)return;
   root.querySelectorAll('[data-pdf-name]').forEach(el=>{
    const x=el.dataset,match=findMatch(x.pdfName);
-   el.textContent=(match&&!match.ambiguous?'📖 Abrir arquivo':'📁 Associar arquivo')+' — página '+(Number(x.pdfPage)||1);
+   el.textContent=(match&&!match.ambiguous&&!match.needsPermission&&!match.restoring?'📖 Abrir arquivo':match?.needsPermission?'🔓 Reautorizar pasta':status==='inicializando'?'⏳ Recuperando biblioteca':'📁 Localizar arquivo')+' — página '+(Number(x.pdfPage)||1);
    el.title=x.pdfName;el.classList.add('pdf-existing-button');
   });
  }
@@ -268,10 +310,25 @@
    const inSubmittedMission=!!(btn.closest('#missionDialog')&&mission?.evidence);
    const restrictedAllowed=inSubmittedMission&&(mission.type!=='simulado_completo'||mission.release_state==='full');
    if(isRestricted(name)&&!restrictedAllowed){notify('Correção bloqueada até a tentativa escrita e sua liberação.');return}
-   if(!findMatch(name)){singlePicker(name);return}
+   const matched=findMatch(name);
+   // O PDF já estava associado, mas o navegador reiniciou e precisa de permissão:
+   // solicitar reautorização da pasta original, nunca selecionar cada PDF novamente.
+   if(matched?.needsPermission||matched?.restoring||status==='reautorizar'||status==='inicializando'){
+    resumeFolderPdf(name,page,restrictedAllowed);return;
+   }
+   if(!matched){
+    if(dirHandle){
+     errorMsg='Não encontrei "'+name+'" na pasta associada. Confira as diferenças de nome; sua biblioteca original não foi apagada.';
+     paint();notify(errorMsg);return;
+    }
+    // Sem pasta autorizada, primeiro mostrar como reutilizar a pasta (não solicitar cada PDF).
+    notify('Conecte uma vez a mesma pasta de PDFs na aba Teoria. Suas associações anteriores não são apagadas.');
+    $pdf('pdfLibraryHub')?.scrollIntoView?.({behavior:'smooth',block:'center'});
+    return;
+   }
    openDocument(name,page,restrictedAllowed);
   },true);
-  initLibrary();
+  libraryReady=initLibrary();
  }
  const olderRender=render;
  render=function(){olderRender();if(!plan)return;paint()};

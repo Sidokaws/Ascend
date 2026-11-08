@@ -144,6 +144,12 @@ if(archives.length)$('theorySchedule').innerHTML+='<details class="item"><summar
 }
 const mainRender=render;
 render=function(){
+if(plan?.schema_version==='2.3-105'){
+ mainRender();
+ $('theoryOverview').innerHTML='<div class="notice"><b>Trilha teórica da agenda de 105 dias.</b> Leituras de e-books, slides e Vade estão integradas nas 300 horas, sem acréscimos. Abra as missões teóricas do dia e seus PDFs nas páginas referenciadas; onde faltar fonte, o painel indicará a pendência.</div>';
+ $('theorySchedule').innerHTML=plan.missions.filter(m=>['teoria','cobertura'].includes(m.type)).map(m=>'<div class="theory-row"><b>'+format(m.date)+'</b><div><b>'+safe(m.title)+'</b><p class="muted small">'+safe(m.source||'Material a conferir')+'</p><button class="btn small-btn" data-open-mission="'+safe(m.id)+'">Abrir atividade e fontes</button></div>'+statusBadge(state.missions[m.id]||m)+'</div>').join('');
+ return;
+}
 if(plan&&(!schedule||state.theoryPlanVersion!=='2.0-pedagogica'))syncReadings();
 mainRender();
 if(!plan||!schedule)return;
@@ -153,6 +159,7 @@ renderTab();
 const dailyBase=renderDaily;
 renderDaily=function(){
 dailyBase();
+if(plan?.schema_version==='2.3-105')return;
 if(!schedule)return;
 const ref=schedule.get(selectedDate);if(!ref)return;
 const container=$('dailyMissions');let html=container.innerHTML;
@@ -170,7 +177,8 @@ const heading=$('dayHeading');if(heading)heading.textContent+=' · ordem pedagó
 };
 const calendarBase=renderCalendar;
 renderCalendar=function(){
-calendarBase();if(!schedule)return;const ref=schedule.get(selectedDate);if(!ref)return;
+calendarBase();if(plan?.schema_version==='2.3-105')return;
+if(!schedule)return;const ref=schedule.get(selectedDate);if(!ref)return;
 $('calDayDetails').innerHTML+='<div class="theory-banner"><b>Etapa teórica adicional: 45 min</b>'
 +'<p>'+errSafe(ref.title)+'<br>'+errSafe(refLabel(ref))+'</p>'
 +'<p>Ordem: '+errSafe(ref.timing)+'</p></div>';

@@ -6,7 +6,7 @@ const ESPECIALIDADES=['Apelação','Memoriais','Resposta à Acusação','RESE','
 const formatPoints=n=>Number(n||0).toFixed(2).replace('.',',');
 function st(){if(!state.adendo2510||typeof state.adendo2510!=='object')state.adendo2510={};const a=state.adendo2510;a.discursive=a.discursive||{};a.exposure=a.exposure||{};a.audits=a.audits||{};a.writingStages=a.writingStages||{};return a}
 function actionCount(type){return plan?.missions?.filter(m=>m.type===type).length||0}
-function officialSim(s){return ACTIVE_WEEKS.has(Number(s.week))}
+function officialSim(s){return plan?.schema_version==='2.3-105'?plan.simulations.some(x=>x.id===s.id&&x.date===s.date):ACTIVE_WEEKS.has(Number(s.week))}
 function sampleStatus(id){return st().exposure[id]||'pendente'}
 function htmlEscape(value){return safe(String(value??''))}
 function sourceSim(s){
@@ -29,7 +29,7 @@ const done=missions.filter(m=>state.missions[m.id]?.validated===true).length;
 const lastPiece=(state.grades||[]).filter(g=>g.type==='Peça'&&g.confirmed).sort((a,b)=>b.date.localeCompare(a.date))[0];
 const due=typeof reviews==='function'?reviews().filter(x=>x.date<=today()&&!state.reviewDone?.[x.key]).length:0;
 el.innerHTML='<div class="adendo-box"><div class="eyebrow">ADENDO DE EXECUÇÃO • 25/10/2026</div><h3>Prioridade, evidência e revisão sem aumentar as 335h</h3>'
-+'<p>Objetivo flexível: <b>cerca de 70%</b> das oportunidades escritas nas seis grandes famílias e <b>30%</b> nas demais medidas. Não é previsão de probabilidade. Nenhuma atividade do plano-base foi removida.</p>'
++'<p>Objetivo flexível: <b>aproximadamente 73%</b> das oportunidades escritas nas seis grandes famílias e <b>27%</b> nas demais medidas. Não é previsão de probabilidade. Nenhuma atividade do plano-base foi removida.</p>'
 +'<p>Materiais: slides, PDFs, modelos e Vade Mecum CEISC. Videoaulas somente para dúvidas pontuais; sem recomendação de recompra do curso nesta etapa.</p>'
 +'<p><b>Prontidão em simulados de primeiro contato:</b> '+prog.streak+' resultado(s) consecutivo(s) ≥ 7,5/10 com notas por questão; objetivo interno de três. Não equivale à garantia de aprovação.</p>'
 +'<div class="adendo-alert"><b><span aria-hidden="true">◈</span> REAPROVEITAMENTO OAB 48</b><p>Edital complementar previsto para <b>12/11/2026</b>. Inscrição prevista de <b>23 a 30/11/2026</b>, sujeita a mudanças. Verifique edital e condições no <a href="https://examedeordem.oab.org.br/Calendario" target="_blank" rel="noopener noreferrer">calendário oficial da OAB</a>. Conferir também materiais permitidos antes dos simulados finais.</p></div>'

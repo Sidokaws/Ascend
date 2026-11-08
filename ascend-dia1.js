@@ -5,7 +5,8 @@
  * e campos para TENTATIVA sem gabarito. Dados locais permanecem na V3.
  */
 (function(){
-const DIA1='ASC-20261026-01',letters=['A','B','C','D','E','F'];
+const DIA1='ASC-20261026-01',NEW_DIA1='ASC105-D001-DIAG',letters=['A','B','C','D','E','F'];
+const isDia1=id=>id===DIA1||id===NEW_DIA1;
 const cases=[
 {letter:'A',title:'A primeira manifestação de Lucas',body:'Lucas, um jovem de 23 anos, responde a uma acusação de furto. O Ministério Público ofereceu denúncia, que foi recebida pelo juiz da vara criminal. Alguns dias depois, um oficial de justiça entregou pessoalmente a Lucas a citação do processo. Assustado, ele procura sua defensora. Até aquele momento, não houve audiência nem depoimento de testemunhas. A defensora precisa escolher qual documento apresentar agora, nessa primeira oportunidade de manifestação escrita.'},
 {letter:'B',title:'O processo de Rafaela depois da audiência',body:'Rafaela está sendo processada por receptação. Ao longo da audiência, o juiz ouviu as testemunhas da acusação, as testemunhas da defesa e interrogou a acusada. Nenhuma outra prova ficou pendente de produção. Em vez de receber a manifestação final oralmente naquela audiência, o magistrado decidiu conceder prazos sucessivos para que acusação e defesa apresentassem suas considerações finais por escrito. Chegou a vez da defesa de Rafaela.'},
@@ -15,7 +16,10 @@ const cases=[
 {letter:'F',title:'A absolvição de Camila é contestada',body:'Camila foi acusada em um processo criminal, mas, depois da instrução, o juiz proferiu sentença favorável a ela. O Ministério Público não concordou com o resultado e interpôs recurso de apelação para tentar modificar a sentença. A defesa de Camila foi intimada para se manifestar sobre os argumentos apresentados pelo Ministério Público. Seu objetivo agora é defender a manutenção da decisão favorável, respondendo ao recurso já apresentado.'}
 ];
 const srcEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function draft(){if(!state.diagnosticoDia1Draft||typeof state.diagnosticoDia1Draft!=='object')state.diagnosticoDia1Draft={};return state.diagnosticoDia1Draft}
+function draft(){
+ const key=plan?.schema_version==='2.3-105'?'diagnostico105Draft':'diagnosticoDia1Draft';
+ if(!state[key]||typeof state[key]!=='object')state[key]={};return state[key];
+}
 function validAttempt(a){return Boolean((a?.phase||a?.piece||a?.doubt||'').trim())&&['0','1','2'].includes(String(a?.confidence??''))}
 function attemptedCount(){return letters.filter(l=>validAttempt(draft()[l])).length}
 function card(c,i){
@@ -29,7 +33,7 @@ return '<div class="dia1-intro"><span class="eyebrow">DIA 01 · IDENTIFICAÇÃO 
 const baseDaily=renderDaily;
 renderDaily=function(){
  baseDaily();
- if(selectedDate!=='2026-10-26')return;
+ if(!['2026-10-26','2026-11-09'].includes(selectedDate))return;
  const el=$('dailyMissions');
  if(!el)return;
  el.innerHTML='<div class="notice"><strong>ONDE FICAM OS 6 CASOS?</strong> Clique em <b>Abrir passo a passo</b> na primeira missão. Os seis casos A–F aparecem na própria tela, com campos para responder. Não há outro caderno ou PDF para procurar.</div>'+el.innerHTML;
@@ -37,7 +41,7 @@ renderDaily=function(){
 const baseOpen=openMission;
 openMission=function(id){
 baseOpen(id);
-if(id!==DIA1)return;
+if(!isDia1(id))return;
 const box=$('v12MissionOutline');const doc=box.innerHTML;
 const a=doc.indexOf('<div class="v12-section-title">Caderno de diagnóstico');
 const b=doc.indexOf('<div class="v12-section-title">Roteiro de execução</div>',a);
@@ -69,7 +73,7 @@ for(const [field,value] of Object.entries(d[c])){const el=document.querySelector
 save();updateProgress();notify('Caso '+c+' marcado como tentativa sem identificação. Isso não é erro automático.');
 }
 function ensureAll(e){
-if($('missionForm')?.elements?.id?.value!==DIA1)return;
+if(!isDia1($('missionForm')?.elements?.id?.value))return;
 const unfilled=letters.filter(l=>!validAttempt(draft()[l]));
 if(unfilled.length){e.preventDefault();e.stopImmediatePropagation();notify('Preencha uma tentativa e escolha segurança 0–2 para os casos: '+unfilled.join(', ')+'. Pode escrever “não sei”.');return}
 $('missionForm').elements.evidence.value=formatAnswers();

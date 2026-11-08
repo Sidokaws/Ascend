@@ -65,7 +65,7 @@ setText('statSims',simCount()+' / 10');
 const current=$('calDayDetails');if(current)current.innerHTML+='<p class="muted">Orçamento otimizado: <b>'+hrs(b.minutes)+'</b> — '+safe(label)+'</p>';
 }
 const oldRender=render;
-render=function(){oldRender();renderOpt()};
+render=function(){oldRender();if(plan?.schema_version==='2.3-105')return;renderOpt()};
 const oldOpen=openMission;
 openMission=function(id){
 oldOpen(id);

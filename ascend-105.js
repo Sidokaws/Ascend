@@ -71,7 +71,7 @@ function countPlan(){
 }
 function auditStats(){
  if(!initialSchema())return;
- const failed=plan.missions.filter(m=>m.source_pending&&(m.type==='discursiva'||m.type==='treino_guiado_peca'||m.type==='simulado_completo'));
+ const failed=plan.missions.filter(m=>state.missions[m.id]?.source_pending&&['discursiva','treino_guiado_peca','simulado_completo'].includes(m.type));
  const missingDisc=failed.filter(m=>m.type==='discursiva').length;
  const missingOffice=failed.filter(m=>m.type==='treino_guiado_peca').length;
  const missingSim=failed.filter(m=>m.type==='simulado_completo').length;

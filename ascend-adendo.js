@@ -7,7 +7,7 @@ const formatPoints=n=>Number(n||0).toFixed(2).replace('.',',');
 function st(){if(!state.adendo2510||typeof state.adendo2510!=='object')state.adendo2510={};const a=state.adendo2510;a.discursive=a.discursive||{};a.exposure=a.exposure||{};a.audits=a.audits||{};a.writingStages=a.writingStages||{};return a}
 function actionCount(type){return plan?.missions?.filter(m=>m.type===type).length||0}
 function officialSim(s){return plan?.schema_version==='2.3-105'?plan.simulations.some(x=>x.id===s.id&&x.date===s.date):ACTIVE_WEEKS.has(Number(s.week))}
-function sampleStatus(id){return st().exposure[id]||'pendente'}
+function sampleStatus(id){return st().exposure[(plan?.schema_version==='2.3-105'?'105-':'')+id]||'pendente'}
 function htmlEscape(value){return safe(String(value??''))}
 function sourceSim(s){
 const pkg=plan.simulation_packages?.[s.id]||Object.values(plan.simulation_packages||{}).find(x=>x.id===s.id||x.data===s.date);
@@ -134,7 +134,7 @@ previousValidate(e);
 function bind(){
 document.addEventListener('change',e=>{
 const field=e.target.closest('[data-adendo-exposure]');
-if(field){st().exposure[field.dataset.adendoExposure]=field.value;save();render();return}
+if(field){st().exposure[(plan?.schema_version==='2.3-105'?'105-':'')+field.dataset.adendoExposure]=field.value;save();render();return}
 const stage=e.target.closest('[data-adendo-stage]');
 if(stage){st().writingStages[stage.dataset.adendoStage]=stage.value;save();notify('Etapa declarada e salva. Domínio depende de produção e correção.');return}
 const weekly=e.target.closest('#adendoWeek');if(weekly){

@@ -1,6 +1,6 @@
 
 'use strict';
-const PLAN_URL='./data/plano-oab48-119-dias-v1.2.json',KEY='ascendOab48V3',PREV='ascendOab48V2';
+const PLAN_URL='./data/plano-oab48-119-dias-v1.2.json',KEY='ascendOab48V3',PREV='ascendOab48V2',PLAN105_KEY='ascendOab48Plan105_v23',PLAN105_ACTIVE='ascendPlanSelected';
 const stages=['Não avaliado','Reconhecimento','Estrutura guiada','Peça integral com consulta','Peça integral autônoma'];
 const pieceNames=['Apelação — procedimento comum','Memoriais — procedimento comum','Resposta à Acusação','RESE — Recurso em Sentido Estrito','Agravo em Execução','Contrarrazões de Apelação','Contrarrazões de RESE','Apelação — Tribunal do Júri','Memoriais — primeira fase do Júri','RESE — pronúncia','Apelação — JECRIM','Queixa-Crime','Queixa-Crime subsidiária','Habeas Corpus','Revisão Criminal','Liberdade Provisória','Relaxamento de Prisão','Revogação da Prisão Preventiva','Defesa Preliminar — Lei de Drogas','Defesa Preliminar — Funcionário Público','Embargos de Declaração','Embargos Infringentes e de Nulidade','Carta Testemunhável','Recurso Ordinário Constitucional','Mandado de Segurança Criminal','Recurso da Acusação / Assistente','Contrarrazões de Agravo em Execução','Outras medidas do edital'];
 const awards=[['✦','Primeiro passo','Uma missão validada',s=>numValid(s)>=1],['⛨','Disciplina crescente','Cinco missões validadas',s=>numValid(s)>=5],['⚔','Aprendiz das peças','Uma peça integral corrigida',s=>pieceCount(s)>=1],['◇','Fundamento sólido','Dez discursivas corrigidas',s=>questionCount(s)>=10],['♜','Caçador de bosses','Um simulado completo e corrigido',s=>simCount(s)>=1],['✧','Rotina sustentada','Trinta missões validadas',s=>numValid(s)>=30],['❖','Revisão consciente','Dez revisões realizadas com evidência',s=>Object.keys(s.reviewDone).length>=10],['✪','Rumo ao Rank S','Dez simulados completos',s=>simCount(s)>=10]];
@@ -24,12 +24,20 @@ old.missions.forEach(m=>{if(!m.id.startsWith('seed')||m.done){const id='v2-'+m.i
 state.legacyImported=true;save();
 }
 function mergePlan(data){
-if(!data||data.days?.length!==119||data.missions?.length!==274||Object.keys(data.question_catalog||{}).length!==100||Object.keys(data.piece_case_catalog||{}).length!==27||Object.keys(data.simulation_packages||{}).length!==15)throw Error('Plano v1.2 incompleto ou divergente');
+const newPlan=data?.schema_version==='2.3-105';
+if(newPlan){
+ if(data.days?.length!==105||data.missions?.length!==276||data.simulations?.length!==10||
+  data.date_start!=='2026-11-09'||data.date_training_end!=='2027-02-21'||
+  data.missions.reduce((n,m)=>n+Number(m.duration_min||0),0)!==18000)
+ throw Error('Plano de 105 dias incompleto ou carga horária divergente');
+}else if(!data||data.days?.length!==119||data.missions?.length!==274||
+ Object.keys(data.question_catalog||{}).length!==100||Object.keys(data.piece_case_catalog||{}).length!==27||
+ Object.keys(data.simulation_packages||{}).length!==15)throw Error('Plano v1.2 incompleto ou divergente');
 if(state.migration_disabled===true){plan=data;selectedDate=data.days.some(d=>d.date===state.selectedDate)?state.selectedDate:data.date_start;state.selectedDate=selectedDate;monthView=new Date(Number(selectedDate.slice(0,4)),Number(selectedDate.slice(5,7))-1,1);save();return;}
 const schema=data.schema_version;
 if(state.plan_version!==schema){
 try{
-const key='ascendOab48V3_PreMigration_v12';
+const key=newPlan?'ascendOab48V3_Backup_105_20261109':'ascendOab48V3_PreMigration_v12';
 if(!localStorage.getItem(key))localStorage.setItem(key,JSON.stringify({savedAt:new Date().toISOString(),state}));
 }catch(e){notify('Backup automático local indisponível: exporte seus dados antes de continuar.');}
 }
@@ -49,7 +57,10 @@ plan=data;selectedDate=data.days.some(d=>d.date===state.selectedDate)?state.sele
 state.selectedDate=selectedDate;monthView=new Date(Number(selectedDate.slice(0,4)),Number(selectedDate.slice(5,7))-1,1);save();
 }
 function missions(){return Object.values(state.missions)}
-function dayMissions(date){return missions().filter(m=>m.date===date&&m.type!=='leitura_teorica'&&m.theory_archived!==true).sort((a,b)=>a.id.localeCompare(b.id))}
+function dayMissions(date){
+const ids=plan?.schema_version==='2.3-105'?new Set(plan.missions.map(m=>m.id)):null;
+return missions().filter(m=>m.date===date&&(!ids||ids.has(m.id)||m.id.startsWith('custom-'))&&m.type!=='leitura_teorica'&&m.theory_archived!==true).sort((a,b)=>a.id.localeCompare(b.id));
+}
 function numValid(s=state){return Object.values(s.missions||{}).filter(m=>m.validated===true).length}
 function validGrades(type,s=state){return (s.grades||[]).filter(g=>g.type===type&&g.confirmed===true)}
 function simCount(s=state){return new Set(validGrades('Simulado',s).filter(g=>g.complete===true&&g.is_full_piece===true).map(g=>g.simId||g.topic||g.id)).size}
@@ -84,9 +95,14 @@ if(!plan)return;
 const inf=levelInfo();const rank=rankFor(inf.level);
 setText('globalRank','RANK '+rank);setText('introFooter','PLAYER: WESLEY  |  RANK '+rank+'  |  A JORNADA COMEÇA AQUI');setText('heroRank',rank);setText('heroXp',totalXp().toLocaleString('pt-BR')+' XP');setText('heroLevel','LV '+String(inf.level).padStart(2,'0'));
 $('heroXpBar').style.width=Math.min(100,inf.current/inf.needed*100)+'%';
-setText('statMissions',numValid()+' / '+plan.missions.length);setText('statPieces',pieceCount()+' / 45');setText('statQuestions',questionCount()+' / 145');setText('statSims',simCount()+' / 15');
-const elapsed=Math.max(0,plan.days.findIndex(d=>d.date===today())+1);setText('heroDays','Dia '+(elapsed||'pré-temporada')+' / 119');
-$('seasonBar').style.width=Math.max(0,Math.min(100,elapsed/119*100))+'%';
+const v105=plan.schema_version==='2.3-105';
+const doneActive=v105?plan.missions.filter(m=>state.missions[m.id]?.validated===true).length:numValid();
+setText('statMissions',doneActive+' / '+plan.missions.length);
+setText('statPieces',pieceCount()+' / '+(v105?40:45));
+setText('statQuestions',questionCount()+' / '+(v105?125:145));
+setText('statSims',simCount()+' / '+(v105?10:15));
+const elapsed=Math.max(0,plan.days.findIndex(d=>d.date===today())+1);setText('heroDays','Dia '+(elapsed||'pré-temporada')+' / '+plan.days.length);
+$('seasonBar').style.width=Math.max(0,Math.min(100,elapsed/plan.days.length*100))+'%';
 $('daySelect').value=selectedDate;renderDaily();renderCalendar();renderPieces();renderQuestions();renderSims();renderReviews();renderAwards();renderSettings();renderTimer();
 }
 function renderDaily(){
@@ -228,7 +244,15 @@ $('customForm').addEventListener('submit',e=>{e.preventDefault();const f=e.targe
 }
 async function init(){
 migrateV2();setupEvents();setText('clockDate',new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'}).toUpperCase());$('customForm').elements.date.value=today();
-try{const response=await fetch(PLAN_URL,{cache:'no-cache'});if(!response.ok)throw Error('HTTP '+response.status);mergePlan(await response.json());render()}catch(err){notify('Falha ao carregar plano de 119 dias. Atualize a página.');console.error(err);setText('dayHeading','Não foi possível carregar os dados do cronograma.');}
+try{
+ let content=null;
+ if(localStorage.getItem(PLAN105_ACTIVE)==='105'){
+  try{content=JSON.parse(localStorage.getItem(PLAN105_KEY)||'null')}catch{content=null}
+ }
+ if(content){mergePlan(content);}
+ else{const response=await fetch(PLAN_URL,{cache:'no-cache'});if(!response.ok)throw Error('HTTP '+response.status);mergePlan(await response.json());}
+ render();
+}catch(err){notify('Falha ao carregar cronograma. Exporte seu backup e recarregue a página.');console.error(err);setText('dayHeading','Não foi possível carregar o cronograma.');}
 setInterval(()=>{if(state.timer)renderTimer()},1000);
 }
 document.addEventListener('DOMContentLoaded',init);

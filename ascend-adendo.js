@@ -16,7 +16,7 @@ const prev=caseId?plan.missions.filter(m=>m.date<s.date&&m.piece_case_id===caseI
 return {caseId,prev};
 }
 function scoreProgress(){
-const exams=(state.grades||[]).filter(g=>g.type==='Simulado'&&g.confirmed&&g.complete&&g.is_full_piece&&officialSim(plan.simulations.find(s=>s.id===(g.simId||g.topic))||{week:0})&&sampleStatus(g.simId||g.topic)==='primeiro');
+const exams=(state.grades||[]).filter(g=>(plan?.schema_version!=='2.3-105'||g.plan_schema==='2.3-105')&&g.type==='Simulado'&&g.confirmed&&g.complete&&g.is_full_piece&&officialSim(plan.simulations.find(s=>s.id===(g.simId||g.topic))||{week:0})&&sampleStatus(g.simId||g.topic)==='primeiro');
 const chosen=[...new Map(exams.map(g=>[g.simId||g.topic,g])).values()].sort((a,b)=>a.date.localeCompare(b.date));
 let streak=0;for(let i=chosen.length-1;i>=0;i--){const g=chosen[i];if(!Array.isArray(g.question_scores)||g.question_scores.length!==4)break;const total=Number(g.score)+g.question_scores.reduce((n,x)=>n+Number(x.score||0),0);if(total>=7.5)streak++;else break}
 return {streak,completed:chosen.length};

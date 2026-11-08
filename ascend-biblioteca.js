@@ -142,7 +142,11 @@
   const url=URL.createObjectURL(file);
   const hash='#page='+Math.max(1,parseInt(page,10)||1);
   try{
-   if(popup&&!popup.closed){popup.opener=null;popup.location.replace(url+hash)}
+   if(popup&&!popup.closed){
+    // Primeiro navega para o PDF. Remover o opener antes da navegação pode
+    // interferir na troca da guia provisória about:blank em alguns navegadores.
+    popup.location.replace(url+hash);
+   }
    else{
     const link=document.createElement('a');link.href=url+hash;link.target='_blank';link.rel='noopener noreferrer';link.click();
    }

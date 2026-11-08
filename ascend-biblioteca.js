@@ -171,19 +171,36 @@
  // Reautorização sem perder os arquivos que já foram associados.
  // O clique cria a aba ANTES de operações assíncronas para evitar bloqueio de pop-ups.
  async function resumeFolderPdf(name,page,allowed){
-  const popup=window.open('about:blank','_blank');
+  let popup=null;
   try{
-   if(status==='inicializando'&&libraryReady)await libraryReady;
+   if(status==='inicializando'&&libraryReady){
+    // A pasta ainda está sendo recuperada do navegador. Nunca abrir seletor de arquivo.
+    await libraryReady;
+    if(status==='reautorizar'){
+     notify('Sua pasta continua associada. Clique mais uma vez em "Reautorizar pasta" para permitir o acesso; não escolha PDFs individualmente.');
+     paint();return;
+    }
+   }
    if(status==='reautorizar'&&dirHandle){
-    // Chamado a partir da interação do usuário. O navegador pode exigir autorização.
-    const permission=await dirHandle.requestPermission({mode:'read'});
-    if(permission!=='granted')throw new Error('O navegador ainda não autorizou a pasta original. Use "Reautorizar acesso à pasta", sem importar os PDFs novamente.');
+    // A solicitação é iniciada ANTES do await e antes de abrir uma nova aba,
+    // preservando a ativação de clique exigida pelo Chrome/Edge.
+    const permissionRequest=dirHandle.requestPermission({mode:'read'});
+    popup=window.open('about:blank','_blank');
+    const permission=await permissionRequest;
+    if(permission!=='granted')throw new Error('A pasta anterior não foi autorizada. Use "Reautorizar acesso à pasta"; nenhum PDF precisa ser importado novamente.');
     index.clear();await scan(dirHandle);saveFolderManifest();
     status='pronto';connectedMode='pasta';errorMsg='';paint();
+    if(!popup){
+     notify('Pasta original reautorizada. Agora clique mais uma vez em "Abrir PDF" para acessar a página. Não é necessário associar arquivos.');
+     return;
+    }
+   }else{
+    popup=window.open('about:blank','_blank');
    }
-   if(!findMatch(name)||findMatch(name)?.needsPermission){
+   const found=findMatch(name);
+   if(!found||found.needsPermission||found.restoring){
     popup?.close();
-    errorMsg='Não encontrei '+name+' na pasta salva. Verifique o nome na biblioteca antes de associar um arquivo individual.';
+    errorMsg='Não encontrei '+name+' na pasta salva. Confira o nome na biblioteca antes de associar outro arquivo.';
     paint();notify(errorMsg);return;
    }
    await openDocument(name,page,allowed,popup);

@@ -141,6 +141,10 @@ function log(id){
 const mainRender=render;
 render=function(){mainRender();if(!plan)return;if(!qualitySchedule||state.qualityPlanSchema!==plan.schema_version){ensure();state.qualityPlanSchema=plan.schema_version;}qualityContext();qualityList();daySection();
  if(plan.schema_version==='2.3-105'){
+ const guidance=$('qualityExamRules');
+ if(guidance){
+  guidance.innerHTML=guidance.innerHTML.replace('Janela SIM-15 do plano original: convertido em revisão final de 2h, sem prova completa no domingo anterior à Revisão Turbo. Não agendar correção na Revisão Turbo a partir de 22/02.','Na nova agenda, 21/02 é revisão final de 2h. As dez provas integrais terminam em 14/02; a Revisão Turbo começa em 22/02.').replace('Último domingo, 21/02','Semana final, 21/02');
+ }
  $('qualityStats').innerHTML='<div class="quality-summary"><div><small>OFICINAS</small><strong>30</strong><small>22 prioritárias + 8 complementares</small></div><div><small>CORREÇÃO E RETESTE</small><strong>30 × 60min</strong><small>Dentro das oficinas de 195min</small></div><div><small>SIMULADOS</small><strong>10</strong><small>300min por prova + revisão posterior</small></div><div><small>CARGA TOTAL</small><strong>300h</strong><small>Nov/2026 a fev/2027</small></div></div>';
  }
 };

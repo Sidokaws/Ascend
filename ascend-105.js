@@ -66,6 +66,12 @@ function countPlan(){
  for(const e of document.querySelectorAll('.statsline span')){
   if(e.textContent?.includes('26/10/2026 – 21/02/2027'))e.textContent='09/11/2026 – 21/02/2027';
  }
+ const nav=document.querySelector('[data-page="calendar"] .nav-text');
+ if(nav)nav.textContent='105 dias';
+ for(const e of document.querySelectorAll('#page-calendar h3, #page-theory .notice')){
+  if(e.textContent?.includes('Mapa de 119 dias'))e.textContent='Mapa de 105 dias';
+  if(e.textContent?.includes('335 horas totais'))e.textContent='Na reprogramação de 105 dias, e-books e slides já estão incluídos nas 300 horas totais, sem carga adicional. Registre as páginas efetivamente estudadas.';
+ }
  const txt=I('dataStatus');
  if(txt)txt.textContent='PLANO VIGENTE: OAB 48 — 105 dias · 300 horas · 276 atividades · '+validated+' validadas nesta temporada. Histórico V2.1 e XP mantidos. Não presume enunciados inexistentes.';
 }

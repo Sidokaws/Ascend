@@ -164,7 +164,7 @@
    if(m.date!==date)continue;
    for(const step of m.step_by_step||[])for(const f of step.fontes||[])add(f.arquivo,f.paginas?.[0]||1,'Missão');
   }
-  const reading=state?.missions?.['LEIT-'+date.replace(/-/g,'')];
+  const reading=plan.schema_version==='2.3-105'?null:state?.missions?.['LEIT-'+date.replace(/-/g,'')];
   for(const f of reading?.sources_detailed||[])add(f.arquivo,f.paginas?.[0]||1,'Trilha teórica');
   return results.slice(0,MAX_DAY);
  }
@@ -189,7 +189,7 @@
  }
  function dayButtons(){
   const el=$pdf('dayPdfLinks');if(!el)return;
-  if(selectedDate==='2026-10-26'&&!state?.missions?.['ASC-20261026-01']?.evidence){
+  if((selectedDate==='2026-10-26'&&!state?.missions?.['ASC-20261026-01']?.evidence)||(selectedDate==='2026-11-09'&&plan?.schema_version==='2.3-105'&&!state?.missions?.['ASC105-D001-DIAG']?.evidence)){
    el.innerHTML='<div class="pdf-day"><b>Biblioteca do Dia 1</b><p class="pdf-note">Primeiro responda aos seis mini-casos do diagnóstico, sem pistas. Após registrar sua tentativa, os links para os slides e e-books do dia serão liberados aqui.</p></div>';
    return;
   }
@@ -200,6 +200,7 @@
    +'<p class="pdf-note">Espelhos e gabaritos não são liberados nesta área antes da tentativa.</p></div>';
  }
  function theoryButtons(){
+  if(plan?.schema_version==='2.3-105')return;
   const rows=$pdf('theorySchedule')?.querySelectorAll?.('.theory-row')||[];
   const planned=plan?.days?.filter(d=>d.weekday!=='sábado'&&d.weekday!=='domingo')||[];
   rows.forEach((row,i)=>{

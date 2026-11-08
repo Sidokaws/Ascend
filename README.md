@@ -1,5 +1,21 @@
 # SYSTEM // ASCEND — OAB 48 · V3 + roteiro executável V1.2
 
+## TEMPORADA REPROGRAMADA (NOV/2026 A FEV/2027) — 105 DIAS / 300 HORAS
+
+**Agenda vigente após ativação local:** 09/11/2026 a 21/02/2027, 105 dias, 15 sábados livres, 300 horas, 30 oficinas (22 prioritárias + 8 complementares), 85 discursivas avulsas e 10 provas completas (40 discursivas adicionais). Revisão Turbo 22 a 27/02; prova-alvo 28/02.
+
+**Ativação necessária:** baixe `ASCEND_Plano_105_Dias_09-11-2026_v2_3.json` disponibilizado na conversa do projeto e, na aba **Dados/Backup** do site, escolha **Ativar cronograma 105 dias (arquivo JSON)**. O arquivo é validado e guardado no navegador. **O site NÃO recebe automaticamente o XLSX nem o JSON enviado no chat**. Antes da ativação, o calendário de 119 dias continua sendo mostrado; isso não é erro.
+
+**Preservação:** nenhum JSON anterior de 119 dias foi excluído; missões V2.3 têm IDs `ASC105-` distintos. O navegador preserva XP, evidências e notas anteriores e salva um backup ao ativar. É possível retornar à visualização antiga sem apagar históricos. As 335 horas da V2.1 eram da versão anterior: **não se somam às 300 horas**.
+
+**Pendências verificáveis:** 64 questões avulsas ainda sem Q-ID/página, 14 oficinas sem enunciado documental confirmado, e 10 pacotes de simulado com 10 peças + 40 questões ainda não definidos. Esses itens ficam previstos e **bloqueados** até vincular enunciados reais. Portanto, as 105 datas fecham em horas e passos, mas **não estão todas aptas à resolução prática**. Não preencher enunciados ou espelhos por suposição.
+
+**Verificação:** sintaxe dos scripts e carregamento sintético da nova temporada passaram; teste visual e importação no Chrome/Edge do usuário continuam recomendados.
+
+[Relatório técnico e lista de conflitos](docs/auditoria-integracao-105-dias-v2.3.md).
+
+---
+
 ## Copiar produção completa para corrigir no ChatGPT — 26/10/2026
 
 Na janela de missão o formulário agora tem **Salvar tentativa no ASCEND** e **⧉ Copiar para o ChatGPT**. O segundo gera uma mensagem completa com ID, data, título, tipo, questão/caso, status, tempo planejado/real, cronômetro bruto-pausas-efetivo quando existente, etapa declarada, fonte, páginas, materiais efetivamente consultados e **texto integral colocado em Produção/Evidência**. Link de foto/documento é incluído como referência, mas **não envia/anexa o arquivo**. Campos não preenchidos são descritos como não informados; gabarito não é antecipado.

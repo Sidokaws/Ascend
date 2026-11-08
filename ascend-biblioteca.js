@@ -288,7 +288,7 @@
   if(db){
    const keys=await new Promise(resolve=>{try{const req=db.transaction(STORE,'readonly').objectStore(STORE).getAllKeys();req.onsuccess=()=>resolve(req.result||[]);req.onerror=()=>resolve([])}catch{resolve([])}});
    indexedFiles=keys.filter(k=>typeof k==='string'&&k.startsWith(FILE_PREFIX)).map(k=>({key:k.slice(FILE_PREFIX.length),name:k.slice(FILE_PREFIX.length)}));
-   if(indexedFiles.length&&status!=='pronto')status='pronto';
+   if(indexedFiles.length&&status==='desconectado')status='pronto'; // Não esconder o pedido de reautorização da pasta
   }
   paint();
  }
@@ -313,7 +313,7 @@
    const matched=findMatch(name);
    // O PDF já estava associado, mas o navegador reiniciou e precisa de permissão:
    // solicitar reautorização da pasta original, nunca selecionar cada PDF novamente.
-   if(matched?.needsPermission||matched?.restoring||status==='reautorizar'||status==='inicializando'){
+   if(matched?.needsPermission||matched?.restoring||(!matched&&(status==='reautorizar'||status==='inicializando'))){
     resumeFolderPdf(name,page,restrictedAllowed);return;
    }
    if(!matched){

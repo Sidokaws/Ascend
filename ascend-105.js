@@ -102,15 +102,20 @@ function bindQuestion(){
  state.sourceBindings105[m.id]={id:qid,file:'Treinamento de Questões _ Enunciado.pdf',page:q.pagina_enunciado,confirmed_at:today()};
  save();render();notify('Vínculo registrado. Abra a atividade; o enunciado fica identificado, mas continua sem gabarito.');
 }
-function isBlocked(m){return initialSchema()&&m?.source_pending&&['discursiva','treino_guiado_peca','simulado_completo'].includes(m.type)}
+function isBlocked(m){
+ if(!initialSchema()||!m)return false;
+ if(m.source_pending&&['discursiva','treino_guiado_peca','simulado_completo'].includes(m.type))return true;
+ if(['reteste','correcao_simulado','correcao'].includes(m.type)&&m.depends_on&&!state.missions[m.depends_on]?.evidence)return true;
+ return false;
+}
 const prevOpen=openMission;
 openMission=function(id){
  prevOpen(id);
  const m=state.missions[id];if(!isBlocked(m))return;
  I('missionForm').classList.add('hidden');
  I('validateBlock').classList.add('hidden');
- I('missionDialogHelp').textContent='Enunciado verificável ainda não vinculado. O cronograma reservou tempo, mas não fornece texto do caso.';
- I('v12MissionOutline').innerHTML='<div class="v12-locked"><h4>Fonte pendente — não inventar enunciado</h4><p>'+ns(m.title)+'</p><p>Antes de executar, identifique a questão ou peça correta no banco CEISC/FGV, registre arquivo, página e ID, e confira se o caso é realmente novo para você. Para discursivas, use a aba Correção e prioridades. Para oficinas e simulados, a alocação deverá ser concluída pela mentoria com caso e padrão conferidos.</p></div>';
+ I('missionDialogHelp').textContent=m.source_pending?'Enunciado verificável ainda não vinculado. O cronograma reservou tempo, mas não fornece texto do caso.':'Primeiro registre a produção/correção anterior desta atividade.';
+ I('v12MissionOutline').innerHTML='<div class="v12-locked"><h4>'+(m.source_pending?'Fonte pendente — não inventar enunciado':'Etapa anterior pendente')+'</h4><p>'+ns(m.title)+'</p><p>'+(m.source_pending?'Antes de executar, vincule o enunciado real no banco CEISC/FGV, com arquivo, página e ID. Use Correção e prioridades para identificar discursivas; oficinas e simulados exigem um pacote auditado pela mentoria.':'Registre primeiro a produção ou a correção anterior. O bloqueio impede que uma atividade seja registrada sem as etapas necessárias.')+'</p></div>';
 };
 const prevRender=render;
 render=function(){

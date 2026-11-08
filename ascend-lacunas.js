@@ -22,7 +22,7 @@ const themes=[
 ];
 const original=render;
 render=function(){
- original();if(!plan)return;
+ original();if(!plan||plan.schema_version==='2.3-105')return;
  const day=getDay(selectedDate);if(day?.weekday!=='sexta-feira')return;
  const [title,instruction,source]=themes[day.week-1]||[];
  if(!title)return;

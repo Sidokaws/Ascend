@@ -52,6 +52,16 @@ const rows=new Set();for(const m of data.missions){
  if(!merged.evidence)merged.evidence='';
  state.missions[m.id]=merged;
 }
+if(newPlan&&state.sourceBindings105){
+ for(const [id,b] of Object.entries(state.sourceBindings105)){
+  const m=state.missions[id],q=data.question_catalog?.[b.id];
+  if(!m||m.type!=='discursiva'||!q||b.file!=='Treinamento de Questões _ Enunciado.pdf'||Number(b.page)!==Number(q.pagina_enunciado))continue;
+  m.question_ids=b.id;
+  m.source=b.file+', p. '+b.page;
+  if(m.step_by_step?.[0])m.step_by_step[0].fontes=[{arquivo:b.file,paginas:[Number(b.page),Number(b.page)]}];
+  m.source_pending=false;m.source_page=Number(b.page);m.case_status='enunciado_verificado_pelo_usuario';
+ }
+}
 state.plan_version=schema;
 plan=data;selectedDate=data.days.some(d=>d.date===state.selectedDate)?state.selectedDate:(data.days.some(d=>d.date===today())?today():data.date_start);
 state.selectedDate=selectedDate;monthView=new Date(Number(selectedDate.slice(0,4)),Number(selectedDate.slice(5,7))-1,1);save();

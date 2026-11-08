@@ -1,0 +1,11 @@
+
+/* ASCEND — reprogramação 09/11 a 21/02: não interfere nas telas anteriores */
+.plan105-status{background:linear-gradient(125deg,#142640,#1b1c3e);border:1px solid #58729e;border-left:4px solid #7fcbfa;border-radius:12px;padding:13px 17px;margin-bottom:15px}
+.plan105-status>b{color:#d8f0ff;letter-spacing:.05em;font-size:13px}
+.plan105-status p{font-size:12px;line-height:1.7;margin:7px 0;color:#b4d0eb}
+.plan105-binding{margin-top:15px;background:#0e1e36;border:1px solid #465d81;border-radius:10px;padding:15px}
+.plan105-binding label{font-size:11px;margin-top:10px;display:block;color:#bbd6ed}
+.plan105-binding select{max-width:100%;width:100%;margin:6px 0 12px}
+#plan105Info{font-size:12px;line-height:1.7;margin:14px 0;padding:12px;border-left:3px solid #87bdf0}
+#plan105Banner{margin-bottom:4px}
+@media(max-width:750px){#plan105Banner{padding:0 4px}.plan105-status{padding:11px}#activatePlan105,#restorePlan119{width:100%}}

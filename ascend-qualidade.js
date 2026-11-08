@@ -40,6 +40,7 @@ function recall(piece){
  return 'destinatário, fundamento, estrutura e pedidos desta mesma medida';
 }
 function makeQualityPlan(){
+ if(plan.schema_version==='2.3-105')return []; // as 30 retests and 10 corrections are already explicit missions
  const entries=[],corrections=plan.missions.filter(m=>m.type==='correcao'),sims=plan.simulations;
  corrections.forEach(c=>{
  const prior=pieceForCorrection(c),piece=actualPieceName(prior),caseId=prior?.piece_case_id||'não identificado';
@@ -107,6 +108,10 @@ function qualityContext(){
  +[['nao_informado','Não informado'],['primeiro_contato','Nunca resolvi — primeiro contato'],['ja_resolvido','Já resolvi — revisão'],['repetido_corrigido','Já corrigi — reteste']].map(([value,label])=>'<option value="'+value+'" '+((state.exposureRecords?.[id]||'nao_informado')===value?'selected':'')+'>'+label+'</option>').join('')+'</select></div>').join('')+'</details>';
 }
 function qualityList(){
+ if(plan.schema_version==='2.3-105'){
+ $('qualitySlots').innerHTML='<div class="notice"><b>Plano vigente: 300 horas.</b> As 30 oficinas já incluem 45 min de correção e 15 min de reteste da mesma peça, e as dez correções pós-simulado já constam nas segundas-feiras correspondentes. Não são atividades adicionais. Abra o dia no calendário para executar cada etapa.</div>';
+ return;
+ }
  const completedCount=qualitySchedule.filter(completed).length;
  $('qualitySlots').innerHTML='<p class="muted small">Retestes documentados: '+completedCount+' / '+qualitySchedule.length+'. Nenhum exercício é validado sem produção e correção.</p><div class="quality-scroll">'
  +qualitySchedule.map(s=>'<div class="item"><div class="section-head"><b class="small">'+format(s.date)+' · '+qesc(s.title)+'</b>'+status(s)+'</div>'
@@ -114,7 +119,7 @@ function qualityList(){
  +(completed(s)?'<p class="item-meta">Produção refeita: '+qesc(state.qualityRecords[s.id].evidence)+'</p>':retestButton(s))+'</div>').join('')+'</div>';
 }
 function daySection(){
- if(!qualitySchedule)return;
+ if(plan?.schema_version==='2.3-105'||!qualitySchedule)return;
  const todays=qualitySchedule.filter(s=>s.date===selectedDate);
  if(!todays.length)return;
  const container=$('dailyMissions');
@@ -134,7 +139,11 @@ function log(id){
  save();render();notify('Correção e reescrita documentadas. Sem XP automático.');
 }
 const mainRender=render;
-render=function(){mainRender();if(!plan)return;if(!qualitySchedule)ensure();qualityContext();qualityList();daySection()};
+render=function(){mainRender();if(!plan)return;if(!qualitySchedule||state.qualityPlanSchema!==plan.schema_version){ensure();state.qualityPlanSchema=plan.schema_version;}qualityContext();qualityList();daySection();
+ if(plan.schema_version==='2.3-105'){
+ $('qualityStats').innerHTML='<div class="quality-summary"><div><small>OFICINAS</small><strong>30</strong><small>22 prioritárias + 8 complementares</small></div><div><small>CORREÇÃO E RETESTE</small><strong>30 × 60min</strong><small>Dentro das oficinas de 195min</small></div><div><small>SIMULADOS</small><strong>10</strong><small>300min por prova + revisão posterior</small></div><div><small>CARGA TOTAL</small><strong>300h</strong><small>Nov/2026 a fev/2027</small></div></div>';
+ }
+};
 const uiSetup=()=>{
  document.addEventListener('click',e=>{const b=e.target.closest('[data-quality-log]');if(b)log(b.dataset.qualityLog)});
  document.addEventListener('change',e=>{const field=e.target.closest('[data-quality-exposure]');if(!field)return;state.exposureRecords[field.dataset.qualityExposure]=field.value;save();notify('Exposição anterior registrada, sem alterar notas ou XP.');});

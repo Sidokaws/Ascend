@@ -73,7 +73,7 @@ out+='<div class="v12-section-title">Roteiro de execução</div>';
 const steps=Array.isArray(m.step_by_step)?m.step_by_step:[];
 out+=steps.map((p,i)=>'<div class="v12-step"><div class="v12-step-num">'+(i+1).toString().padStart(2,'0')+'</div><div class="v12-step-body"><div class="v12-step-head"><span>ETAPA '+(i+1)+'</span><span>'+esc(p.minutos||0)+' min</span></div><p>'+esc(p.instrução||p.instrucao||'')+'</p>'+((p.fontes||[]).length?'<details><summary>Materiais exatos desta etapa</summary>'+sourcesHtml(p.fontes,allowedPattern(m))+'</details>':'')+'</div></div>').join('');
 out+='<div class="v12-section-title">Entrega obrigatória</div><div class="v12-objective"><p>'+esc(m.deliverable||m.evidence_required||'Registrar produção.')+'</p></div>';
-out+='<div class="v12-section-title">Critério de sucesso</div><p class="v12-note">'+esc(m.success_condition||'Produção enviada e corrigida.')+'</p>';
+// Critério de sucesso removido do painel: o acompanhamento usa apenas dois checks.
 if(m.teacher_note)out+='<p class="v12-note"><b>Nota da mentoria:</b> '+esc(m.teacher_note)+'</p>';
 return out;
 }
